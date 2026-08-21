@@ -178,23 +178,58 @@
   .sface .zh-word { font-size: 1.2rem; }
   .sface .zh-word::before { content: "中 "; font-size: .64rem; color: var(--ink-muted); }
   .sface .en-word::before { content: "EN "; font-size: .58rem; color: var(--ink-muted); vertical-align: 2px; }
-
-  .star-fab {
-    position: absolute; top: 10px; right: 10px; z-index: 2; width: 34px; height: 34px; border-radius: 50%;
-    border: 1px solid var(--line); background: var(--surface); color: var(--orange-strong);
-    display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;
+  .example {
+    width: 100%; margin-top: 8px; padding-top: 10px; border-top: 1px dashed var(--line);
+    display: flex; flex-direction: column; gap: 3px; text-align: center; flex-shrink: 0;
   }
-  .star-fab[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .example .ex-fr { font-size: .82rem; font-style: italic; color: var(--ink); }
+  .example .ex-zh { font-size: .78rem; color: var(--ink-muted); }
 
   .deck-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; }
   .deck-nav button {
     border: 1px solid var(--line); background: var(--surface); color: var(--ink);
     border-radius: 14px; padding: 13px 18px; font-size: .95rem; cursor: pointer; font-weight: 600;
-    min-width: 44px;
+    min-width: 44px; flex-shrink: 0;
   }
-  .deck-nav button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); flex: 1; max-width: 190px; }
-  .deck-nav button.side { flex-shrink: 0; }
+  .deck-hint { flex: 1; text-align: center; font-size: .8rem; color: var(--ink-muted); }
   .swipe-hint { text-align: center; color: var(--ink-muted); font-size: .74rem; margin-top: 12px; }
+
+  .grade-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+  .grade-row button.grade {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    border: 1px solid var(--line); background: var(--surface); border-radius: 14px;
+    padding: 10px 4px; font-size: 1.3rem; cursor: pointer;
+  }
+  .grade-row button.grade span { font-size: .72rem; font-weight: 600; color: var(--ink-muted); }
+  .grade-row button.again:hover, .grade-row button.again:focus-visible { border-color: #d97a6b; background: color-mix(in srgb, #d97a6b 12%, var(--surface)); }
+  .grade-row button.hard:hover, .grade-row button.hard:focus-visible { border-color: var(--orange-strong); background: var(--orange); }
+  .grade-row button.good:hover, .grade-row button.good:focus-visible { border-color: #6fae7c; background: color-mix(in srgb, #6fae7c 14%, var(--surface)); }
+
+  .srs-info { font-size: .68rem; color: var(--ink-muted); }
+
+  /* ---------- Quiz ---------- */
+  .quiz-score { font-size: .82rem; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .quiz-card { max-width: 420px; margin: 18px auto 0; }
+  .quiz-question {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+    padding: 24px; text-align: center; margin-bottom: 16px;
+  }
+  .quiz-question .fr-word { font-family: var(--font-display); font-size: 1.8rem; text-wrap: balance; }
+  .quiz-question .ipa-line { font-size: .85rem; color: var(--accent); display: block; margin-top: 4px; }
+  .quiz-question .cat-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 8px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-option {
+    border: 1px solid var(--line); background: var(--surface); border-radius: 12px;
+    padding: 12px 14px; font-size: .92rem; text-align: left; cursor: pointer; color: var(--ink);
+  }
+  .quiz-option:hover:not(:disabled) { border-color: var(--accent); }
+  .quiz-option.correct { background: color-mix(in srgb, #6fae7c 18%, var(--surface)); border-color: #6fae7c; font-weight: 700; }
+  .quiz-option.wrong { background: color-mix(in srgb, #d97a6b 14%, var(--surface)); border-color: #d97a6b; }
+  .quiz-option:disabled { cursor: default; opacity: .75; }
+  .quiz-next-btn {
+    display: block; width: 100%; margin-top: 16px; border: 1px solid var(--accent); background: var(--accent);
+    color: var(--accent-ink); border-radius: 14px; padding: 13px; font-size: .95rem; font-weight: 700; cursor: pointer;
+  }
 
   /* ---------- List view ---------- */
   .list-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-top: 14px; }
@@ -205,6 +240,8 @@
   }
   table.vlist td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
   table.vlist td div + div { margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--line); }
+  table.vlist .ex-cell { font-size: .78rem; color: var(--ink-muted); line-height: 1.5; }
+  table.vlist .ex-cell em { color: var(--ink); font-style: italic; }
   table.vlist tr:last-child td { border-bottom: none; }
   table.vlist tr:hover td { background: var(--surface-2); }
   table.vlist .fr-cell { font-family: var(--font-display); font-size: 1rem; }
@@ -243,13 +280,14 @@
       <p>基础 + 进阶词汇 · 英中双语 · 参照牛津法英词典</p>
     </div>
     <div class="stats">
-      <div class="figure">已掌握 <b id="masteredCount">0</b> / <span id="totalCount">0</span></div>
+      <div class="figure">已掌握 <b id="masteredCount">0</b> / <span id="totalCount">0</span> · 待复习 <b id="dueCount">0</b></div>
       <div class="bar"><span id="progressBar" style="width:0%"></span></div>
     </div>
   </header>
 
   <div class="tabbar" role="tablist">
     <button id="tabStudyBtn" role="tab" aria-selected="true" type="button">📇 闪卡背词</button>
+    <button id="tabQuizBtn" role="tab" aria-selected="false" type="button">🎯 测验</button>
     <button id="tabListBtn" role="tab" aria-selected="false" type="button">☰ 浏览列表</button>
   </div>
 
@@ -263,7 +301,7 @@
   <section id="studyPanel">
     <div class="opts">
       <label class="check"><input type="checkbox" id="shuffleCb" /> 乱序播放</label>
-      <label class="check"><input type="checkbox" id="onlyUnmasteredStudy" /> 只学未掌握</label>
+      <label class="check"><input type="checkbox" id="onlyDueStudy" /> 只看待复习</label>
       <button class="reshuffle" id="reshuffleBtn" type="button" hidden>🔀 换个顺序</button>
     </div>
 
@@ -276,14 +314,32 @@
           <div class="sface front" id="studyFront"></div>
           <div class="sface back" id="studyBack"></div>
         </div>
-        <button class="star-fab" id="studyStar" type="button" aria-label="标记已掌握">☆</button>
       </div>
       <div class="deck-nav">
         <button class="side" id="prevBtn" type="button" aria-label="上一个">‹</button>
-        <button class="primary" id="masterBtn" type="button">★ 标记已掌握</button>
+        <span class="deck-hint" id="deckHint">点击卡片翻面查看释义</span>
         <button class="side" id="nextBtn" type="button" aria-label="下一个">›</button>
       </div>
-      <p class="swipe-hint">点击卡片翻面 · 左右滑动切换单词</p>
+      <div class="grade-row" id="gradeRow" hidden>
+        <button class="grade again" id="gradeAgainBtn" type="button">😵<span>没记住</span></button>
+        <button class="grade hard" id="gradeHardBtn" type="button">🤔<span>有点印象</span></button>
+        <button class="grade good" id="gradeGoodBtn" type="button">😀<span>记住了</span></button>
+      </div>
+      <p class="swipe-hint">左右滑动可跳过 · 翻面后请选一个掌握程度</p>
+    </div>
+  </section>
+
+  <!-- Quiz panel -->
+  <section id="quizPanel" hidden>
+    <div class="opts">
+      <span class="quiz-score" id="quizScore">本轮：0 / 0</span>
+      <button class="reshuffle" id="quizRestartBtn" type="button">🔄 换一批</button>
+    </div>
+    <div id="quizEmpty" class="empty" hidden>这组筛选条件下词太少（至少需要 4 个），换个大类或取消筛选试试。</div>
+    <div class="quiz-card" id="quizArea">
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <button class="quiz-next-btn" id="quizNextBtn" type="button" hidden>下一题 →</button>
     </div>
   </section>
 
@@ -307,7 +363,7 @@
   </section>
 
   <footer>
-    <span>词义主要依据《牛津法英词典》（Oxford French Dictionary）常见义项整理，覆盖 TEF 基础到进阶（约 A2–C1）高频主题；名词保留冠词以辅助记忆阴阳性。粉色标签＝基础词汇，橙色标签＝进阶词汇。每个词都标注了国际音标（IPA），支持浏览器的设备可点 🔊 听真人合成发音（音标与发音由本工具整理生成，备考时建议再对照权威音频核实）。已掌握标记保存在本设备浏览器里，按法语单词本身记录，更新词库不会打乱它；但浏览器存储偶尔仍可能被清空，建议不定期用下面的"导出进度"存一份，需要时用"导入进度"恢复。</span>
+    <span>词义主要依据《牛津法英词典》（Oxford French Dictionary）常见义项整理，覆盖 TEF 基础到进阶（约 A2–C1）高频主题；名词保留冠词以辅助记忆阴阳性。粉色标签＝基础词汇，橙色标签＝进阶词汇。每个词都标注了国际音标（IPA），支持浏览器的设备可点 🔊 听真人合成发音（音标与发音由本工具整理生成，备考时建议再对照权威音频核实）。闪卡背诵用的是间隔复习：翻面后选"没记住 / 有点印象 / 记住了"，系统会据此安排这个词下次出现的时间，越容易忘的词会越快再考你。学习记录保存在本设备浏览器里，按法语单词本身记录，更新词库不会打乱它；但浏览器存储偶尔仍可能被清空，建议不定期用下面的"导出进度"存一份，需要时用"导入进度"恢复。</span>
     <div class="footer-actions">
       <button class="reset-btn" id="exportBtn" type="button">⬇ 导出进度</button>
       <label class="reset-btn file-label" for="importFile">⬆ 导入进度</label>
@@ -382,7 +438,7 @@
     {fr:"la mère", ipa:"la mɛʁ", pos:"n.f.", en:"mother", zh:"母亲", cat:"家庭"},
     {fr:"le frère", ipa:"lə fʁɛʁ", pos:"n.m.", en:"brother", zh:"兄弟", cat:"家庭"},
     {fr:"la sœur", ipa:"la sœʁ", pos:"n.f.", en:"sister", zh:"姐妹", cat:"家庭"},
-    {fr:"les parents", ipa:"le paʁɑ̃", pos:"n.m.pl.", en:"parents", zh:"父母", en2:"relatives, kin (broader sense)", zh2:"亲戚（广义）", cat:"家庭"},
+    {fr:"les parents", ipa:"le paʁɑ̃", pos:"n.m.pl.", en:"parents", zh:"父母", en2:"relatives, kin (broader sense)", zh2:"亲戚（广义）", ex:"Mes parents et amis étaient tous invités au mariage.", exZh:"我的亲戚朋友都被邀请参加了婚礼。", cat:"家庭"},
     {fr:"l'enfant", ipa:"lɑ̃fɑ̃", pos:"n.", en:"child", zh:"孩子", cat:"家庭"},
     {fr:"le mari", ipa:"lə maʁi", pos:"n.m.", en:"husband", zh:"丈夫", cat:"家庭"},
     {fr:"la femme", ipa:"la fam", pos:"n.f.", en:"wife / woman", zh:"妻子；女人", cat:"家庭"},
@@ -403,8 +459,8 @@
     {fr:"tôt", ipa:"to", pos:"adv.", en:"early", zh:"早", cat:"时间"},
     {fr:"tard", ipa:"taʁ", pos:"adv.", en:"late", zh:"晚", cat:"时间"},
     {fr:"souvent", ipa:"suvɑ̃", pos:"adv.", en:"often", zh:"经常", cat:"时间"},
-    {fr:"toujours", ipa:"tuʒuʁ", pos:"adv.", en:"always", zh:"总是", en2:"still (i.e., continuing)", zh2:"仍然，还", cat:"时间"},
-    {fr:"jamais", ipa:"ʒamɛ", pos:"adv.", en:"never", zh:"从不", en2:"ever (in questions)", zh2:"（疑问句中）曾经", cat:"时间"},
+    {fr:"toujours", ipa:"tuʒuʁ", pos:"adv.", en:"always", zh:"总是", en2:"still (i.e., continuing)", zh2:"仍然，还", ex:"Il est toujours là, il n'est pas parti.", exZh:"他还在那儿，没走。", cat:"时间"},
+    {fr:"jamais", ipa:"ʒamɛ", pos:"adv.", en:"never", zh:"从不", en2:"ever (in questions)", zh2:"（疑问句中）曾经", ex:"As-tu jamais visité Paris ?", exZh:"你曾经去过巴黎吗？", cat:"时间"},
     {fr:"parfois", ipa:"paʁfwa", pos:"adv.", en:"sometimes", zh:"有时", cat:"时间"},
 
     // 饮食 Nourriture et boissons
@@ -413,9 +469,9 @@
     {fr:"le café", ipa:"lə kafe", pos:"n.m.", en:"coffee", zh:"咖啡", cat:"饮食"},
     {fr:"le fromage", ipa:"lə fʁɔmaʒ", pos:"n.m.", en:"cheese", zh:"奶酪", cat:"饮食"},
     {fr:"la viande", ipa:"la vjɑ̃d", pos:"n.f.", en:"meat", zh:"肉", cat:"饮食"},
-    {fr:"le poisson", ipa:"lə pwasɔ̃", pos:"n.m.", en:"fish", zh:"鱼", en2:"(capitalized, Poissons) Pisces (zodiac sign)", zh2:"（大写Poissons）双鱼座", cat:"饮食"},
+    {fr:"le poisson", ipa:"lə pwasɔ̃", pos:"n.m.", en:"fish", zh:"鱼", en2:"(capitalized, Poissons) Pisces (zodiac sign)", zh2:"（大写Poissons）双鱼座", ex:"Elle est née en mars, elle est Poissons.", exZh:"她三月出生，是双鱼座。", cat:"饮食"},
     {fr:"les légumes", ipa:"le leɡym", pos:"n.m.pl.", en:"vegetables", zh:"蔬菜", cat:"饮食"},
-    {fr:"le fruit", ipa:"lə fʁɥi", pos:"n.m.", en:"fruit", zh:"水果", en2:"(figurative) fruit, result (of effort)", zh2:"（比喻）成果", cat:"饮食"},
+    {fr:"le fruit", ipa:"lə fʁɥi", pos:"n.m.", en:"fruit", zh:"水果", en2:"(figurative) fruit, result (of effort)", zh2:"（比喻）成果", ex:"Ce succès est le fruit de son travail acharné.", exZh:"这次成功是他刻苦努力的成果。", cat:"饮食"},
     {fr:"le repas", ipa:"lə ʁəpa", pos:"n.m.", en:"meal", zh:"餐", cat:"饮食"},
     {fr:"le petit-déjeuner", ipa:"lə pəti deʒœne", pos:"n.m.", en:"breakfast", zh:"早餐", cat:"饮食"},
     {fr:"le déjeuner", ipa:"lə deʒœne", pos:"n.m.", en:"lunch", zh:"午餐", cat:"饮食"},
@@ -428,12 +484,12 @@
     {fr:"la maison", ipa:"la mɛzɔ̃", pos:"n.f.", en:"house", zh:"房子", cat:"住房"},
     {fr:"l'appartement", ipa:"lapaʁtəmɑ̃", pos:"n.m.", en:"apartment", zh:"公寓", cat:"住房"},
     {fr:"la chambre", ipa:"la ʃɑ̃bʁ", pos:"n.f.", en:"bedroom", zh:"卧室", cat:"住房"},
-    {fr:"la cuisine", ipa:"la kɥizin", pos:"n.f.", en:"kitchen", zh:"厨房", en2:"cuisine, cooking (style of food)", zh2:"烹饪，菜系", cat:"住房"},
+    {fr:"la cuisine", ipa:"la kɥizin", pos:"n.f.", en:"kitchen", zh:"厨房", en2:"cuisine, cooking (style of food)", zh2:"烹饪，菜系", ex:"J'adore la cuisine italienne.", exZh:"我很喜欢意大利菜系。", cat:"住房"},
     {fr:"la salle de bains", ipa:"la sal də bɛ̃", pos:"n.f.", en:"bathroom", zh:"浴室", cat:"住房"},
-    {fr:"le salon", ipa:"lə salɔ̃", pos:"n.m.", en:"living room", zh:"客厅", en2:"trade show, exhibition", zh2:"展销会", cat:"住房"},
+    {fr:"le salon", ipa:"lə salɔ̃", pos:"n.m.", en:"living room", zh:"客厅", en2:"trade show, exhibition", zh2:"展销会", ex:"Le Salon de l'auto attire des milliers de visiteurs.", exZh:"车展吸引了成千上万的参观者。", cat:"住房"},
     {fr:"le loyer", ipa:"lə lwaje", pos:"n.m.", en:"rent", zh:"房租", cat:"住房"},
     {fr:"déménager", ipa:"demenaʒe", pos:"v.", en:"to move house", zh:"搬家", cat:"住房"},
-    {fr:"le quartier", ipa:"lə kaʁtje", pos:"n.m.", en:"neighbourhood / district", zh:"街区", en2:"headquarters (in 'quartier général')", zh2:"总部（用于quartier général）", cat:"住房"},
+    {fr:"le quartier", ipa:"lə kaʁtje", pos:"n.m.", en:"neighbourhood / district", zh:"街区", en2:"headquarters (in 'quartier général')", zh2:"总部（用于quartier général）", ex:"Le général a rejoint le quartier général.", exZh:"将军回到了总部。", cat:"住房"},
 
     // 工作 Travail et études
     {fr:"le travail", ipa:"lə tʁavaj", pos:"n.m.", en:"work / job", zh:"工作", cat:"工作"},
@@ -445,18 +501,18 @@
     {fr:"l'école", ipa:"lekɔl", pos:"n.f.", en:"school", zh:"学校", cat:"工作"},
     {fr:"l'université", ipa:"lynivɛʁsite", pos:"n.f.", en:"university", zh:"大学", cat:"工作"},
     {fr:"étudier", ipa:"etydje", pos:"v.", en:"to study", zh:"学习", cat:"工作"},
-    {fr:"l'examen", ipa:"lɛɡzamɛ̃", pos:"n.m.", en:"exam", zh:"考试", en2:"medical examination", zh2:"体检，医学检查", cat:"工作"},
+    {fr:"l'examen", ipa:"lɛɡzamɛ̃", pos:"n.m.", en:"exam", zh:"考试", en2:"medical examination", zh2:"体检，医学检查", ex:"Le médecin lui a fait passer un examen complet.", exZh:"医生给他做了全面体检。", cat:"工作"},
     {fr:"le diplôme", ipa:"lə diplom", pos:"n.m.", en:"diploma", zh:"文凭", cat:"工作"},
 
     // 交通 Transports et voyages
     {fr:"la voiture", ipa:"la vwatyʁ", pos:"n.f.", en:"car", zh:"汽车", cat:"交通"},
-    {fr:"le train", ipa:"lə tʁɛ̃", pos:"n.m.", en:"train", zh:"火车", en2:"(in 'être en train de + infinitive') in the process of, currently -ing", zh2:"（用于être en train de + 动词原形）正在做……", cat:"交通"},
+    {fr:"le train", ipa:"lə tʁɛ̃", pos:"n.m.", en:"train", zh:"火车", en2:"(in 'être en train de + infinitive') in the process of, currently -ing", zh2:"（用于être en train de + 动词原形）正在做……", ex:"Elle est en train de préparer le dîner.", exZh:"她正在准备晚饭。", cat:"交通"},
     {fr:"l'avion", ipa:"lavjɔ̃", pos:"n.m.", en:"airplane", zh:"飞机", cat:"交通"},
     {fr:"le bus", ipa:"lə bys", pos:"n.m.", en:"bus", zh:"公交车", cat:"交通"},
     {fr:"le métro", ipa:"lə metʁo", pos:"n.m.", en:"subway", zh:"地铁", cat:"交通"},
     {fr:"la gare", ipa:"la ɡaʁ", pos:"n.f.", en:"train station", zh:"火车站", cat:"交通"},
     {fr:"l'aéroport", ipa:"laeʁɔpɔʁ", pos:"n.m.", en:"airport", zh:"机场", cat:"交通"},
-    {fr:"le billet", ipa:"lə bijɛ", pos:"n.m.", en:"ticket", zh:"票", en2:"banknote", zh2:"纸币", cat:"交通"},
+    {fr:"le billet", ipa:"lə bijɛ", pos:"n.m.", en:"ticket", zh:"票", en2:"banknote", zh2:"纸币", ex:"Il a payé avec un billet de 50 euros.", exZh:"他用一张50欧元的纸币付了款。", cat:"交通"},
     {fr:"voyager", ipa:"vwajaʒe", pos:"v.", en:"to travel", zh:"旅行", cat:"交通"},
     {fr:"réserver", ipa:"ʁezɛʁve", pos:"v.", en:"to book / reserve", zh:"预订", cat:"交通"},
     {fr:"le passeport", ipa:"lə paspɔʁ", pos:"n.m.", en:"passport", zh:"护照", cat:"交通"},
@@ -465,16 +521,16 @@
     {fr:"acheter", ipa:"aʃte", pos:"v.", en:"to buy", zh:"买", cat:"购物"},
     {fr:"vendre", ipa:"vɑ̃dʁ", pos:"v.", en:"to sell", zh:"卖", cat:"购物"},
     {fr:"le magasin", ipa:"lə maɡazɛ̃", pos:"n.m.", en:"shop", zh:"商店", cat:"购物"},
-    {fr:"le prix", ipa:"lə pʁi", pos:"n.m.", en:"price", zh:"价格", en2:"prize, award", zh2:"奖项", cat:"购物"},
+    {fr:"le prix", ipa:"lə pʁi", pos:"n.m.", en:"price", zh:"价格", en2:"prize, award", zh2:"奖项", ex:"Elle a reçu le prix Nobel de littérature.", exZh:"她获得了诺贝尔文学奖。", cat:"购物"},
     {fr:"l'argent", ipa:"laʁʒɑ̃", pos:"n.m.", en:"money", zh:"钱", cat:"购物"},
     {fr:"payer", ipa:"peje", pos:"v.", en:"to pay", zh:"支付", cat:"购物"},
-    {fr:"cher / chère", ipa:"ʃɛʁ", pos:"adj.", en:"expensive", zh:"贵的", en2:"dear (term of endearment)", zh2:"亲爱的（称呼）", cat:"购物"},
+    {fr:"cher / chère", ipa:"ʃɛʁ", pos:"adj.", en:"expensive", zh:"贵的", en2:"dear (term of endearment)", zh2:"亲爱的（称呼）", ex:"Mon cher ami, comment vas-tu ?", exZh:"亲爱的朋友，你好吗？", cat:"购物"},
     {fr:"bon marché", ipa:"bɔ̃ maʁʃe", pos:"loc.adj.", en:"cheap", zh:"便宜的", cat:"购物"},
     {fr:"la carte bancaire", ipa:"la kaʁt bɑ̃kɛʁ", pos:"n.f.", en:"bank card", zh:"银行卡", cat:"购物"},
-    {fr:"la monnaie", ipa:"la mɔnɛ", pos:"n.f.", en:"change (money)", zh:"零钱", en2:"currency", zh2:"货币", cat:"购物"},
+    {fr:"la monnaie", ipa:"la mɔnɛ", pos:"n.f.", en:"change (money)", zh:"零钱", en2:"currency", zh2:"货币", ex:"L'euro est la monnaie de nombreux pays européens.", exZh:"欧元是许多欧洲国家的货币。", cat:"购物"},
 
     // 健康 Santé
-    {fr:"la santé", ipa:"la sɑ̃te", pos:"n.f.", en:"health", zh:"健康", en2:"(as a toast) cheers!", zh2:"（祝酒词）干杯！", cat:"健康"},
+    {fr:"la santé", ipa:"la sɑ̃te", pos:"n.f.", en:"health", zh:"健康", en2:"(as a toast) cheers!", zh2:"（祝酒词）干杯！", ex:"À ta santé !", exZh:"干杯！", cat:"健康"},
     {fr:"malade", ipa:"malad", pos:"adj.", en:"sick", zh:"生病的", cat:"健康"},
     {fr:"le médecin", ipa:"lə medsɛ̃", pos:"n.m.", en:"doctor", zh:"医生", cat:"健康"},
     {fr:"l'hôpital", ipa:"lopital", pos:"n.m.", en:"hospital", zh:"医院", cat:"健康"},
@@ -486,11 +542,11 @@
     // 休闲 Loisirs et sports
     {fr:"le loisir", ipa:"lə lwaziʁ", pos:"n.m.", en:"leisure", zh:"休闲", cat:"休闲"},
     {fr:"lire", ipa:"liʁ", pos:"v.", en:"to read", zh:"阅读", cat:"休闲"},
-    {fr:"le livre", ipa:"lə livʁ", pos:"n.m.", en:"book", zh:"书", en2:"(feminine: la livre) pound (weight or currency)", zh2:"（阴性la livre）磅（重量或货币单位）", cat:"休闲"},
+    {fr:"le livre", ipa:"lə livʁ", pos:"n.m.", en:"book", zh:"书", en2:"(feminine: la livre) pound (weight or currency)", zh2:"（阴性la livre）磅（重量或货币单位）", ex:"Ce sac pèse deux livres.", exZh:"这个包重两磅。", cat:"休闲"},
     {fr:"le film", ipa:"lə film", pos:"n.m.", en:"film", zh:"电影", cat:"休闲"},
     {fr:"la musique", ipa:"la myzik", pos:"n.f.", en:"music", zh:"音乐", cat:"休闲"},
     {fr:"le sport", ipa:"lə spɔʁ", pos:"n.m.", en:"sport", zh:"运动", cat:"休闲"},
-    {fr:"jouer", ipa:"ʒwe", pos:"v.", en:"to play", zh:"玩", en2:"to play (an instrument); to act (in a play/film)", zh2:"演奏；演（戏）", cat:"休闲"},
+    {fr:"jouer", ipa:"ʒwe", pos:"v.", en:"to play", zh:"玩", en2:"to play (an instrument); to act (in a play/film)", zh2:"演奏；演（戏）", ex:"Elle joue du piano depuis dix ans.", exZh:"她弹钢琴已经十年了。", cat:"休闲"},
     {fr:"nager", ipa:"naʒe", pos:"v.", en:"to swim", zh:"游泳", cat:"休闲"},
     {fr:"se promener", ipa:"sə pʁɔmne", pos:"v.", en:"to take a walk", zh:"散步", cat:"休闲"},
 
@@ -506,7 +562,7 @@
     {fr:"traverser", ipa:"tʁavɛʁse", pos:"v.", en:"to cross", zh:"穿过", cat:"城市"},
 
     // 天气 Météo
-    {fr:"le temps", ipa:"lə tɑ̃", pos:"n.m.", en:"weather", zh:"天气", en2:"time", zh2:"时间", cat:"天气"},
+    {fr:"le temps", ipa:"lə tɑ̃", pos:"n.m.", en:"weather", zh:"天气", en2:"time", zh2:"时间", ex:"Je n'ai pas le temps de sortir ce soir.", exZh:"我今晚没时间出去。", cat:"天气"},
     {fr:"il pleut", ipa:"il plø", pos:"loc.v.", en:"it's raining", zh:"下雨", cat:"天气"},
     {fr:"il neige", ipa:"il nɛʒ", pos:"loc.v.", en:"it's snowing", zh:"下雪", cat:"天气"},
     {fr:"il fait beau", ipa:"il fɛ bo", pos:"loc.v.", en:"the weather is nice", zh:"天气好", cat:"天气"},
@@ -517,12 +573,12 @@
 
     // 服饰 Vêtements
     {fr:"le vêtement", ipa:"lə vɛtmɑ̃", pos:"n.m.", en:"clothing", zh:"衣服", cat:"服饰"},
-    {fr:"la chemise", ipa:"la ʃəmiz", pos:"n.f.", en:"shirt", zh:"衬衫", en2:"folder, paper wallet", zh2:"文件夹，纸质文件套", cat:"服饰"},
+    {fr:"la chemise", ipa:"la ʃəmiz", pos:"n.f.", en:"shirt", zh:"衬衫", en2:"folder, paper wallet", zh2:"文件夹，纸质文件套", ex:"Range ces documents dans une chemise.", exZh:"把这些文件放进一个文件夹里。", cat:"服饰"},
     {fr:"le pantalon", ipa:"lə pɑ̃talɔ̃", pos:"n.m.", en:"trousers", zh:"裤子", cat:"服饰"},
     {fr:"la robe", ipa:"la ʁɔb", pos:"n.f.", en:"dress", zh:"连衣裙", cat:"服饰"},
     {fr:"les chaussures", ipa:"le ʃosyʁ", pos:"n.f.pl.", en:"shoes", zh:"鞋子", cat:"服饰"},
     {fr:"le manteau", ipa:"lə mɑ̃to", pos:"n.m.", en:"coat", zh:"大衣", cat:"服饰"},
-    {fr:"porter", ipa:"pɔʁte", pos:"v.", en:"to wear", zh:"穿", en2:"to carry", zh2:"搬运，携带", cat:"服饰"},
+    {fr:"porter", ipa:"pɔʁte", pos:"v.", en:"to wear", zh:"穿", en2:"to carry", zh2:"搬运，携带", ex:"Il porte une valise très lourde.", exZh:"他扛着一个很重的行李箱。", cat:"服饰"},
 
     // 情感 Émotions et caractère
     {fr:"content(e)", ipa:"kɔ̃tɑ̃", pos:"adj.", en:"happy", zh:"高兴的", cat:"情感"},
@@ -537,9 +593,9 @@
     // 交流 Communication
     {fr:"parler", ipa:"paʁle", pos:"v.", en:"to speak", zh:"说话", cat:"交流"},
     {fr:"écouter", ipa:"ekute", pos:"v.", en:"to listen", zh:"听", cat:"交流"},
-    {fr:"comprendre", ipa:"kɔ̃pʁɑ̃dʁ", pos:"v.", en:"to understand", zh:"理解", en2:"to comprise, include", zh2:"包括，包含", cat:"交流"},
+    {fr:"comprendre", ipa:"kɔ̃pʁɑ̃dʁ", pos:"v.", en:"to understand", zh:"理解", en2:"to comprise, include", zh2:"包括，包含", ex:"Le forfait comprend le petit-déjeuner.", exZh:"这个套餐包含早餐。", cat:"交流"},
     {fr:"expliquer", ipa:"ɛksplike", pos:"v.", en:"to explain", zh:"解释", cat:"交流"},
-    {fr:"demander", ipa:"dəmɑ̃de", pos:"v.", en:"to ask", zh:"问", en2:"to require, take (time/effort)", zh2:"需要（时间/精力）", cat:"交流"},
+    {fr:"demander", ipa:"dəmɑ̃de", pos:"v.", en:"to ask", zh:"问", en2:"to require, take (time/effort)", zh2:"需要（时间/精力）", ex:"Ce projet demande beaucoup de patience.", exZh:"这个项目需要很多耐心。", cat:"交流"},
     {fr:"répondre", ipa:"ʁepɔ̃dʁ", pos:"v.", en:"to answer", zh:"回答", cat:"交流"},
     {fr:"le téléphone", ipa:"lə telefɔn", pos:"n.m.", en:"telephone", zh:"电话", cat:"交流"},
     {fr:"envoyer", ipa:"ɑ̃vwaje", pos:"v.", en:"to send", zh:"发送", cat:"交流"},
@@ -586,7 +642,7 @@
     {fr:"remettre en question", ipa:"ʁəmɛtʁ ɑ̃ kɛstjɔ̃", pos:"loc.v.", en:"to call into question", zh:"对……提出质疑", cat:"观点表达"},
 
     // 行政事务 Démarches administratives
-    {fr:"le dossier", ipa:"lə dosje", pos:"n.m.", en:"file / application", zh:"档案，申请材料", en2:"the back (of a chair/seat)", zh2:"椅背（家具部件）", cat:"行政事务"},
+    {fr:"le dossier", ipa:"lə dosje", pos:"n.m.", en:"file / application", zh:"档案，申请材料", en2:"the back (of a chair/seat)", zh2:"椅背（家具部件）", ex:"Le dossier de cette chaise est cassé.", exZh:"这把椅子的椅背坏了。", cat:"行政事务"},
     {fr:"la démarche", ipa:"la demaʁʃ", pos:"n.f.", en:"administrative step", zh:"（办理）手续", cat:"行政事务"},
     {fr:"le justificatif", ipa:"lə ʒystifikatif", pos:"n.m.", en:"supporting document", zh:"证明文件", cat:"行政事务"},
     {fr:"la pièce d'identité", ipa:"la pjɛs didɑ̃tite", pos:"n.f.", en:"ID document", zh:"身份证件", cat:"行政事务"},
@@ -601,7 +657,7 @@
     {fr:"un rendez-vous", ipa:"œ̃ ʁɑ̃devu", pos:"n.m.", en:"appointment", zh:"预约", cat:"行政事务"},
     {fr:"une attestation", ipa:"yn atɛstasjɔ̃", pos:"n.f.", en:"certificate", zh:"证明书", cat:"行政事务"},
     {fr:"valable", ipa:"valabl", pos:"adj.", en:"valid", zh:"有效的", cat:"行政事务"},
-    {fr:"délivrer", ipa:"delivʁe", pos:"v.", en:"to issue (a document)", zh:"签发", en2:"to free, rescue (someone from danger or distress)", zh2:"解救，使解脱（某人脱离危险或困境）", cat:"行政事务"},
+    {fr:"délivrer", ipa:"delivʁe", pos:"v.", en:"to issue (a document)", zh:"签发", en2:"to free, rescue (someone from danger or distress)", zh2:"解救，使解脱（某人脱离危险或困境）", ex:"Les pompiers ont délivré la victime des flammes.", exZh:"消防员把受害者从火中救了出来。", cat:"行政事务"},
 
     // 职场进阶 Monde du travail
     {fr:"un entretien d'embauche", ipa:"œ̃n‿ɑ̃tʁətjɛ̃ dɑ̃boʃ", pos:"n.m.", en:"job interview", zh:"求职面试", cat:"职场进阶"},
@@ -615,13 +671,13 @@
     {fr:"le contrat", ipa:"lə kɔ̃tʁa", pos:"n.m.", en:"contract", zh:"合同", cat:"职场进阶"},
     {fr:"à plein temps", ipa:"a plɛ̃ tɑ̃", pos:"loc.adv.", en:"full-time", zh:"全职", cat:"职场进阶"},
     {fr:"à temps partiel", ipa:"a tɑ̃ paʁsjɛl", pos:"loc.adv.", en:"part-time", zh:"兼职", cat:"职场进阶"},
-    {fr:"gérer", ipa:"ʒeʁe", pos:"v.", en:"to manage", zh:"管理", en2:"(colloquial, 'je gère') to handle it, have it under control", zh2:"（口语je gère）搞定了，能应付", cat:"职场进阶"},
-    {fr:"le/la responsable", ipa:"lə ʁɛspɔ̃sabl", pos:"n.", en:"manager / person in charge", zh:"负责人", en2:"(as adjective, responsable) responsible", zh2:"（作形容词）负责任的", cat:"职场进阶"},
+    {fr:"gérer", ipa:"ʒeʁe", pos:"v.", en:"to manage", zh:"管理", en2:"(colloquial, 'je gère') to handle it, have it under control", zh2:"（口语je gère）搞定了，能应付", ex:"T'inquiète, je gère la situation.", exZh:"别担心，我能搞定这个情况。", cat:"职场进阶"},
+    {fr:"le/la responsable", ipa:"lə ʁɛspɔ̃sabl", pos:"n.", en:"manager / person in charge", zh:"负责人", en2:"(as adjective, responsable) responsible", zh2:"（作形容词）负责任的", ex:"Chacun doit être responsable de ses actes.", exZh:"每个人都应该对自己的行为负责。", cat:"职场进阶"},
     {fr:"l'employeur/euse", ipa:"lɑ̃plwajœʁ", pos:"n.", en:"employer", zh:"雇主", cat:"职场进阶"},
-    {fr:"négocier", ipa:"neɡɔsje", pos:"v.", en:"to negotiate", zh:"谈判", en2:"to take, negotiate (a bend, while driving)", zh2:"（驾驶时）过（弯道）", cat:"职场进阶"},
+    {fr:"négocier", ipa:"neɡɔsje", pos:"v.", en:"to negotiate", zh:"谈判", en2:"to take, negotiate (a bend, while driving)", zh2:"（驾驶时）过（弯道）", ex:"Il faut négocier ce virage lentement.", exZh:"这个弯道要慢慢过。", cat:"职场进阶"},
     {fr:"la réunion", ipa:"la ʁeynjɔ̃", pos:"n.f.", en:"meeting", zh:"会议", cat:"职场进阶"},
-    {fr:"le projet", ipa:"lə pʁɔʒɛ", pos:"n.m.", en:"project", zh:"项目", en2:"a draft, bill (e.g. 'un projet de loi')", zh2:"草案，提案（如projet de loi法律草案）", cat:"职场进阶"},
-    {fr:"un objectif", ipa:"œ̃n‿ɔbʒɛktif", pos:"n.m.", en:"objective", zh:"目标", en2:"lens (photography)", zh2:"镜头（摄影）", cat:"职场进阶"},
+    {fr:"le projet", ipa:"lə pʁɔʒɛ", pos:"n.m.", en:"project", zh:"项目", en2:"a draft, bill (e.g. 'un projet de loi')", zh2:"草案，提案（如projet de loi法律草案）", ex:"Le gouvernement a présenté un projet de loi.", exZh:"政府提出了一项法律草案。", cat:"职场进阶"},
+    {fr:"un objectif", ipa:"œ̃n‿ɔbʒɛktif", pos:"n.m.", en:"objective", zh:"目标", en2:"lens (photography)", zh2:"镜头（摄影）", ex:"Cet appareil a un objectif grand angle.", exZh:"这台相机有一个广角镜头。", cat:"职场进阶"},
     {fr:"atteindre", ipa:"atɛ̃dʁ", pos:"v.", en:"to reach / achieve", zh:"达到", cat:"职场进阶"},
     {fr:"une échéance", ipa:"yn eʃeɑ̃s", pos:"n.f.", en:"deadline", zh:"截止期限", cat:"职场进阶"},
 
@@ -689,34 +745,34 @@
     {fr:"prévoir", ipa:"pʁevwaʁ", pos:"v.", en:"to foresee / plan", zh:"预见，计划", cat:"高级动词"},
     {fr:"exiger", ipa:"ɛɡziʒe", pos:"v.", en:"to require / demand", zh:"要求", cat:"高级动词"},
     {fr:"permettre", ipa:"pɛʁmɛtʁ", pos:"v.", en:"to allow", zh:"允许", cat:"高级动词"},
-    {fr:"réussir à", ipa:"ʁeysiʁ a", pos:"v.", en:"to succeed in", zh:"成功做到", en2:"to pass (an exam/test)", zh2:"通过（考试）", cat:"高级动词"},
-    {fr:"échouer", ipa:"eʃwe", pos:"v.", en:"to fail", zh:"失败", en2:"(literal) to run aground (of a ship)", zh2:"（本义）搁浅（船只）", cat:"高级动词"},
+    {fr:"réussir à", ipa:"ʁeysiʁ a", pos:"v.", en:"to succeed in", zh:"成功做到", en2:"to pass (an exam/test)", zh2:"通过（考试）", ex:"Elle a réussi son examen du premier coup.", exZh:"她一次就通过了考试。", cat:"高级动词"},
+    {fr:"échouer", ipa:"eʃwe", pos:"v.", en:"to fail", zh:"失败", en2:"(literal) to run aground (of a ship)", zh2:"（本义）搁浅（船只）", ex:"Le navire a échoué près de la côte.", exZh:"那艘船在海岸附近搁浅了。", cat:"高级动词"},
     {fr:"hésiter", ipa:"ezite", pos:"v.", en:"to hesitate", zh:"犹豫", cat:"高级动词"},
     {fr:"se plaindre", ipa:"sə plɛ̃dʁ", pos:"v.", en:"to complain", zh:"抱怨", cat:"高级动词"},
     {fr:"remarquer", ipa:"ʁəmaʁke", pos:"v.", en:"to notice", zh:"注意到", cat:"高级动词"},
     {fr:"admettre", ipa:"admɛtʁ", pos:"v.", en:"to admit", zh:"承认", cat:"高级动词"},
     {fr:"reconnaître", ipa:"ʁəkɔnɛtʁ", pos:"v.", en:"to recognize / acknowledge", zh:"承认，认出", cat:"高级动词"},
-    {fr:"prétendre", ipa:"pʁetɑ̃dʁ", pos:"v.", en:"to claim", zh:"声称", en2:"to aspire to, have pretensions to (prétendre à)", zh2:"渴望得到，觊觎（prétendre à）", cat:"高级动词"},
+    {fr:"prétendre", ipa:"pʁetɑ̃dʁ", pos:"v.", en:"to claim", zh:"声称", en2:"to aspire to, have pretensions to (prétendre à)", zh2:"渴望得到，觊觎（prétendre à）", ex:"Il prétend à un poste de direction.", exZh:"他觊觎一个管理职位。", cat:"高级动词"},
     {fr:"supposer", ipa:"sypoze", pos:"v.", en:"to suppose", zh:"假设", cat:"高级动词"},
     {fr:"estimer", ipa:"ɛstime", pos:"v.", en:"to consider, estimate", zh:"认为，估计", cat:"高级动词"},
 
     // 惯用表达 Expressions idiomatiques
-    {fr:"avoir raison", ipa:"avwaʁ ʁɛzɔ̃", pos:"loc.v.", en:"to be right", zh:"有道理，是对的", cat:"惯用表达"},
-    {fr:"avoir tort", ipa:"avwaʁ tɔʁ", pos:"loc.v.", en:"to be wrong", zh:"是错的", cat:"惯用表达"},
-    {fr:"tomber amoureux/euse", ipa:"tɔ̃be amuʁø", pos:"loc.v.", en:"to fall in love", zh:"坠入爱河", cat:"惯用表达"},
-    {fr:"avoir l'habitude de", ipa:"avwaʁ labityd də", pos:"loc.v.", en:"to be used to", zh:"习惯于", cat:"惯用表达"},
-    {fr:"faire attention à", ipa:"fɛʁ atɑ̃sjɔ̃ a", pos:"loc.v.", en:"to pay attention to", zh:"注意", cat:"惯用表达"},
-    {fr:"se rendre compte de", ipa:"sə ʁɑ̃dʁ kɔ̃t də", pos:"loc.v.", en:"to realize", zh:"意识到", cat:"惯用表达"},
-    {fr:"avoir besoin de", ipa:"avwaʁ bəzwɛ̃ də", pos:"loc.v.", en:"to need", zh:"需要", cat:"惯用表达"},
-    {fr:"avoir envie de", ipa:"avwaʁ ɑ̃vi də", pos:"loc.v.", en:"to feel like", zh:"想要", cat:"惯用表达"},
-    {fr:"avoir l'air de", ipa:"avwaʁ lɛʁ də", pos:"loc.v.", en:"to seem", zh:"看起来", cat:"惯用表达"},
-    {fr:"poser sa candidature", ipa:"poze sa kɑ̃didatyʁ", pos:"loc.v.", en:"to apply (for a job)", zh:"提交申请，应聘", cat:"惯用表达"},
-    {fr:"prendre une décision", ipa:"pʁɑ̃dʁ yn desizjɔ̃", pos:"loc.v.", en:"to make a decision", zh:"做决定", cat:"惯用表达"},
-    {fr:"tenir compte de", ipa:"təniʁ kɔ̃t də", pos:"loc.v.", en:"to take into account", zh:"考虑到", cat:"惯用表达"},
-    {fr:"mettre en place", ipa:"mɛtʁ ɑ̃ plas", pos:"loc.v.", en:"to set up, implement", zh:"建立，实施", cat:"惯用表达"},
-    {fr:"jouer un rôle", ipa:"ʒwe œ̃ ʁol", pos:"loc.v.", en:"to play a role", zh:"起作用", cat:"惯用表达"},
-    {fr:"faire face à", ipa:"fɛʁ fas a", pos:"loc.v.", en:"to face, cope with", zh:"面对", cat:"惯用表达"},
-    {fr:"avoir lieu", ipa:"avwaʁ ljø", pos:"loc.v.", en:"to take place", zh:"发生，举行", cat:"惯用表达"},
+    {fr:"avoir raison", ipa:"avwaʁ ʁɛzɔ̃", pos:"loc.v.", en:"to be right", zh:"有道理，是对的", ex:"Tu as raison, il vaut mieux partir tôt.", exZh:"你说得对，最好早点出发。", cat:"惯用表达"},
+    {fr:"avoir tort", ipa:"avwaʁ tɔʁ", pos:"loc.v.", en:"to be wrong", zh:"是错的", ex:"Je pense que tu as tort sur ce point.", exZh:"我觉得你在这一点上错了。", cat:"惯用表达"},
+    {fr:"tomber amoureux/euse", ipa:"tɔ̃be amuʁø", pos:"loc.v.", en:"to fall in love", zh:"坠入爱河", ex:"Il est tombé amoureux d'elle au premier regard.", exZh:"他对她一见钟情，坠入了爱河。", cat:"惯用表达"},
+    {fr:"avoir l'habitude de", ipa:"avwaʁ labityd də", pos:"loc.v.", en:"to be used to", zh:"习惯于", ex:"J'ai l'habitude de me lever tôt.", exZh:"我习惯早起。", cat:"惯用表达"},
+    {fr:"faire attention à", ipa:"fɛʁ atɑ̃sjɔ̃ a", pos:"loc.v.", en:"to pay attention to", zh:"注意", ex:"Fais attention à la marche, elle est haute.", exZh:"小心台阶，它很高。", cat:"惯用表达"},
+    {fr:"se rendre compte de", ipa:"sə ʁɑ̃dʁ kɔ̃t də", pos:"loc.v.", en:"to realize", zh:"意识到", ex:"Il s'est rendu compte de son erreur trop tard.", exZh:"他意识到自己的错误时已经太晚了。", cat:"惯用表达"},
+    {fr:"avoir besoin de", ipa:"avwaʁ bəzwɛ̃ də", pos:"loc.v.", en:"to need", zh:"需要", ex:"J'ai besoin d'aide pour ce projet.", exZh:"这个项目我需要帮助。", cat:"惯用表达"},
+    {fr:"avoir envie de", ipa:"avwaʁ ɑ̃vi də", pos:"loc.v.", en:"to feel like", zh:"想要", ex:"J'ai envie d'un café maintenant.", exZh:"我现在想喝杯咖啡。", cat:"惯用表达"},
+    {fr:"avoir l'air de", ipa:"avwaʁ lɛʁ də", pos:"loc.v.", en:"to seem", zh:"看起来", ex:"Elle a l'air fatiguée aujourd'hui.", exZh:"她今天看起来很累。", cat:"惯用表达"},
+    {fr:"poser sa candidature", ipa:"poze sa kɑ̃didatyʁ", pos:"loc.v.", en:"to apply (for a job)", zh:"提交申请，应聘", ex:"Il a posé sa candidature pour ce poste.", exZh:"他为这个职位提交了申请。", cat:"惯用表达"},
+    {fr:"prendre une décision", ipa:"pʁɑ̃dʁ yn desizjɔ̃", pos:"loc.v.", en:"to make a decision", zh:"做决定", ex:"Nous devons prendre une décision rapidement.", exZh:"我们必须尽快做出决定。", cat:"惯用表达"},
+    {fr:"tenir compte de", ipa:"təniʁ kɔ̃t də", pos:"loc.v.", en:"to take into account", zh:"考虑到", ex:"Il faut tenir compte de son avis.", exZh:"应该考虑他的意见。", cat:"惯用表达"},
+    {fr:"mettre en place", ipa:"mɛtʁ ɑ̃ plas", pos:"loc.v.", en:"to set up, implement", zh:"建立，实施", ex:"L'entreprise a mis en place un nouveau système.", exZh:"公司实施了一套新系统。", cat:"惯用表达"},
+    {fr:"jouer un rôle", ipa:"ʒwe œ̃ ʁol", pos:"loc.v.", en:"to play a role", zh:"起作用", ex:"L'éducation joue un rôle essentiel dans la société.", exZh:"教育在社会中起着至关重要的作用。", cat:"惯用表达"},
+    {fr:"faire face à", ipa:"fɛʁ fas a", pos:"loc.v.", en:"to face, cope with", zh:"面对", ex:"Elle doit faire face à de nombreux défis.", exZh:"她必须面对许多挑战。", cat:"惯用表达"},
+    {fr:"avoir lieu", ipa:"avwaʁ ljø", pos:"loc.v.", en:"to take place", zh:"发生，举行", ex:"La réunion aura lieu vendredi prochain.", exZh:"会议将于下周五举行。", cat:"惯用表达"},
 
     // ===== 第二批扩充：基础词汇补充 =====
 
@@ -731,18 +787,18 @@
     {fr:"la bouche", ipa:"la buʃ", pos:"n.f.", en:"mouth", zh:"嘴", cat:"身体部位"},
     {fr:"le nez", ipa:"lə ne", pos:"n.m.", en:"nose", zh:"鼻子", cat:"身体部位"},
     {fr:"l'oreille", ipa:"lɔʁɛj", pos:"n.f.", en:"ear", zh:"耳朵", cat:"身体部位"},
-    {fr:"la main", ipa:"la mɛ̃", pos:"n.f.", en:"hand", zh:"手", en2:"(in 'donner un coup de main') a hand, help", zh2:"（用于donner un coup de main）帮忙", cat:"身体部位"},
+    {fr:"la main", ipa:"la mɛ̃", pos:"n.f.", en:"hand", zh:"手", en2:"(in 'donner un coup de main') a hand, help", zh2:"（用于donner un coup de main）帮忙", ex:"Peux-tu me donner un coup de main ?", exZh:"你能帮我一下吗？", cat:"身体部位"},
     {fr:"le bras", ipa:"lə bʁa", pos:"n.m.", en:"arm", zh:"手臂", cat:"身体部位"},
     {fr:"la jambe", ipa:"la ʒɑ̃b", pos:"n.f.", en:"leg", zh:"腿", cat:"身体部位"},
     {fr:"le pied", ipa:"lə pje", pos:"n.m.", en:"foot", zh:"脚", cat:"身体部位"},
     {fr:"le dos", ipa:"lə do", pos:"n.m.", en:"back", zh:"背", cat:"身体部位"},
     {fr:"le ventre", ipa:"lə vɑ̃tʁ", pos:"n.m.", en:"stomach", zh:"腹部", cat:"身体部位"},
-    {fr:"le cœur", ipa:"lə kœʁ", pos:"n.m.", en:"heart", zh:"心脏", en2:"heart, core (of something)", zh2:"核心，中心", cat:"身体部位"},
+    {fr:"le cœur", ipa:"lə kœʁ", pos:"n.m.", en:"heart", zh:"心脏", en2:"heart, core (of something)", zh2:"核心，中心", ex:"Elle est le cœur de notre équipe.", exZh:"她是我们团队的核心。", cat:"身体部位"},
     {fr:"la peau", ipa:"la po", pos:"n.f.", en:"skin", zh:"皮肤", cat:"身体部位"},
     {fr:"le doigt", ipa:"lə dwa", pos:"n.m.", en:"finger", zh:"手指", cat:"身体部位"},
     {fr:"l'épaule", ipa:"lepol", pos:"n.f.", en:"shoulder", zh:"肩膀", cat:"身体部位"},
     {fr:"le genou", ipa:"lə ʒənu", pos:"n.m.", en:"knee", zh:"膝盖", cat:"身体部位"},
-    {fr:"la gorge", ipa:"la ɡɔʁʒ", pos:"n.f.", en:"throat", zh:"喉咙", en2:"gorge, canyon (geography)", zh2:"峡谷（地理）", cat:"身体部位"},
+    {fr:"la gorge", ipa:"la ɡɔʁʒ", pos:"n.f.", en:"throat", zh:"喉咙", en2:"gorge, canyon (geography)", zh2:"峡谷（地理）", ex:"Ils ont visité une gorge spectaculaire dans les Alpes.", exZh:"他们参观了阿尔卑斯山一处壮观的峡谷。", cat:"身体部位"},
 
     // 动物与自然 Animaux et nature
     {fr:"le chien", ipa:"lə ʃjɛ̃", pos:"n.m.", en:"dog", zh:"狗", cat:"动物与自然"},
@@ -756,7 +812,7 @@
     {fr:"la mer", ipa:"la mɛʁ", pos:"n.f.", en:"sea", zh:"海", cat:"动物与自然"},
     {fr:"le lac", ipa:"lə lak", pos:"n.m.", en:"lake", zh:"湖", cat:"动物与自然"},
     {fr:"la rivière", ipa:"la ʁivjɛʁ", pos:"n.f.", en:"river", zh:"河流", cat:"动物与自然"},
-    {fr:"le ciel", ipa:"lə sjɛl", pos:"n.m.", en:"sky", zh:"天空", en2:"heaven (religious sense)", zh2:"天堂（宗教意义）", cat:"动物与自然"},
+    {fr:"le ciel", ipa:"lə sjɛl", pos:"n.m.", en:"sky", zh:"天空", en2:"heaven (religious sense)", zh2:"天堂（宗教意义）", ex:"Les croyants espèrent aller au ciel.", exZh:"信徒们希望能上天堂。", cat:"动物与自然"},
     {fr:"l'arbre", ipa:"laʁbʁ", pos:"n.m.", en:"tree", zh:"树", cat:"动物与自然"},
     {fr:"la fleur", ipa:"la flœʁ", pos:"n.f.", en:"flower", zh:"花", cat:"动物与自然"},
     {fr:"la plante", ipa:"la plɑ̃t", pos:"n.f.", en:"plant", zh:"植物", cat:"动物与自然"},
@@ -764,7 +820,7 @@
     {fr:"l'herbe", ipa:"lɛʁb", pos:"n.f.", en:"grass", zh:"草", cat:"动物与自然"},
     {fr:"la campagne", ipa:"la kɑ̃paɲ", pos:"n.f.", en:"countryside", zh:"乡村", cat:"动物与自然"},
     {fr:"une étoile", ipa:"yn etwal", pos:"n.f.", en:"star", zh:"星星", cat:"动物与自然"},
-    {fr:"la lune", ipa:"la lyn", pos:"n.f.", en:"moon", zh:"月亮", en2:"(idiom: être dans la lune) to daydream", zh2:"（习语être dans la lune）心不在焉，走神", cat:"动物与自然"},
+    {fr:"la lune", ipa:"la lyn", pos:"n.f.", en:"moon", zh:"月亮", en2:"(idiom: être dans la lune) to daydream", zh2:"（习语être dans la lune）心不在焉，走神", ex:"Arrête de rêver, tu es dans la lune !", exZh:"别做白日梦了，你走神了！", cat:"动物与自然"},
     {fr:"le désert", ipa:"lə dezɛʁ", pos:"n.m.", en:"desert", zh:"沙漠", cat:"动物与自然"},
     {fr:"la pierre", ipa:"la pjɛʁ", pos:"n.f.", en:"stone", zh:"石头", cat:"动物与自然"},
 
@@ -789,18 +845,18 @@
     // 学校与教室 Classe et matériel scolaire
     {fr:"le/la professeur(e)", ipa:"lə pʁɔfesœʁ", pos:"n.", en:"teacher", zh:"老师", cat:"学校与教室"},
     {fr:"l'élève", ipa:"lelɛv", pos:"n.", en:"pupil", zh:"学生", cat:"学校与教室"},
-    {fr:"la classe", ipa:"la klas", pos:"n.f.", en:"classroom / class", zh:"教室，班级", en2:"class, style (figurative, avoir de la classe)", zh2:"（比喻）风度，格调（avoir de la classe）", cat:"学校与教室"},
-    {fr:"le cours", ipa:"lə kuʁ", pos:"n.m.", en:"lesson", zh:"课程", en2:"(exchange) rate; course (of events)", zh2:"汇率；（事态）进程", cat:"学校与教室"},
+    {fr:"la classe", ipa:"la klas", pos:"n.f.", en:"classroom / class", zh:"教室，班级", en2:"class, style (figurative, avoir de la classe)", zh2:"（比喻）风度，格调（avoir de la classe）", ex:"Cette voiture a beaucoup de classe.", exZh:"这辆车很有格调。", cat:"学校与教室"},
+    {fr:"le cours", ipa:"lə kuʁ", pos:"n.m.", en:"lesson", zh:"课程", en2:"(exchange) rate; course (of events)", zh2:"汇率；（事态）进程", ex:"Le cours de l'euro a baissé ce matin.", exZh:"今天早上欧元汇率下跌了。", cat:"学校与教室"},
     {fr:"le cahier", ipa:"lə kaje", pos:"n.m.", en:"notebook", zh:"笔记本", cat:"学校与教室"},
     {fr:"le stylo", ipa:"lə stilo", pos:"n.m.", en:"pen", zh:"钢笔", cat:"学校与教室"},
     {fr:"le crayon", ipa:"lə kʁɛjɔ̃", pos:"n.m.", en:"pencil", zh:"铅笔", cat:"学校与教室"},
     {fr:"la règle", ipa:"la ʁɛɡl", pos:"n.f.", en:"ruler", zh:"尺子", cat:"学校与教室"},
-    {fr:"le tableau", ipa:"lə tablo", pos:"n.m.", en:"board", zh:"黑板", en2:"painting; chart, table", zh2:"画作；表格", cat:"学校与教室"},
+    {fr:"le tableau", ipa:"lə tablo", pos:"n.m.", en:"board", zh:"黑板", en2:"painting; chart, table", zh2:"画作；表格", ex:"Ce tableau de Monet vaut une fortune.", exZh:"莫奈的这幅画价值连城。", cat:"学校与教室"},
     {fr:"les mathématiques", ipa:"le matematik", pos:"n.f.pl.", en:"mathematics", zh:"数学", cat:"学校与教室"},
     {fr:"l'histoire", ipa:"listwaʁ", pos:"n.f.", en:"history", zh:"历史", cat:"学校与教室"},
     {fr:"la géographie", ipa:"la ʒeɔɡʁafi", pos:"n.f.", en:"geography", zh:"地理", cat:"学校与教室"},
     {fr:"la note", ipa:"la nɔt", pos:"n.f.", en:"grade / mark", zh:"分数", cat:"学校与教室"},
-    {fr:"le devoir", ipa:"lə dəvwaʁ", pos:"n.m.", en:"homework", zh:"作业", en2:"duty, obligation", zh2:"责任，义务", cat:"学校与教室"},
+    {fr:"le devoir", ipa:"lə dəvwaʁ", pos:"n.m.", en:"homework", zh:"作业", en2:"duty, obligation", zh2:"责任，义务", ex:"C'est ton devoir d'aider tes parents.", exZh:"帮助父母是你的责任。", cat:"学校与教室"},
     {fr:"apprendre", ipa:"apʁɑ̃dʁ", pos:"v.", en:"to learn", zh:"学习", cat:"学校与教室"},
     {fr:"enseigner", ipa:"ɑ̃sɛɲe", pos:"v.", en:"to teach", zh:"教", cat:"学校与教室"},
     {fr:"la récréation", ipa:"la ʁekʁeasjɔ̃", pos:"n.f.", en:"recess, break", zh:"课间休息", cat:"学校与教室"},
@@ -825,9 +881,9 @@
     {fr:"pendant", ipa:"pɑ̃dɑ̃", pos:"prép.", en:"during", zh:"在……期间", cat:"疑问词与虚词"},
 
     // 餐厅与咖啡馆 Au restaurant et au café
-    {fr:"la carte", ipa:"la kaʁt", pos:"n.f.", en:"menu", zh:"菜单", en2:"card (e.g. playing card, ID card)", zh2:"卡片（如扑克牌、证件）", cat:"餐厅与咖啡馆"},
+    {fr:"la carte", ipa:"la kaʁt", pos:"n.f.", en:"menu", zh:"菜单", en2:"card (e.g. playing card, ID card)", zh2:"卡片（如扑克牌、证件）", ex:"Il a montré sa carte d'identité au policier.", exZh:"他向警察出示了身份证。", cat:"餐厅与咖啡馆"},
     {fr:"commander", ipa:"kɔmɑ̃de", pos:"v.", en:"to order", zh:"点菜", cat:"餐厅与咖啡馆"},
-    {fr:"l'addition", ipa:"ladisjɔ̃", pos:"n.f.", en:"the bill", zh:"账单", en2:"addition (mathematics)", zh2:"（数学）加法", cat:"餐厅与咖啡馆"},
+    {fr:"l'addition", ipa:"ladisjɔ̃", pos:"n.f.", en:"the bill", zh:"账单", en2:"addition (mathematics)", zh2:"（数学）加法", ex:"Deux plus deux, c'est une addition simple.", exZh:"二加二是个简单的加法。", cat:"餐厅与咖啡馆"},
     {fr:"le serveur / la serveuse", ipa:"lə sɛʁvœʁ", pos:"n.", en:"waiter / waitress", zh:"服务员", cat:"餐厅与咖啡馆"},
     {fr:"le pourboire", ipa:"lə puʁbwaʁ", pos:"n.m.", en:"tip", zh:"小费", cat:"餐厅与咖啡馆"},
     {fr:"une table", ipa:"yn tabl", pos:"n.f.", en:"table", zh:"桌子", cat:"餐厅与咖啡馆"},
@@ -846,12 +902,12 @@
 
     // 商场购物场景 Dans les magasins
     {fr:"essayer", ipa:"eseje", pos:"v.", en:"to try on", zh:"试穿", cat:"商场购物场景"},
-    {fr:"la taille", ipa:"la taj", pos:"n.f.", en:"size (clothing)", zh:"尺码", en2:"waist (body)", zh2:"腰", cat:"商场购物场景"},
+    {fr:"la taille", ipa:"la taj", pos:"n.f.", en:"size (clothing)", zh:"尺码", en2:"waist (body)", zh2:"腰", ex:"Elle a une taille très fine.", exZh:"她的腰很细。", cat:"商场购物场景"},
     {fr:"la pointure", ipa:"la pwɛ̃tyʁ", pos:"n.f.", en:"shoe size", zh:"鞋码", cat:"商场购物场景"},
     {fr:"en solde", ipa:"ɑ̃ sɔld", pos:"loc.adj.", en:"on sale", zh:"打折的", cat:"商场购物场景"},
     {fr:"la réduction", ipa:"la ʁedyksjɔ̃", pos:"n.f.", en:"discount", zh:"折扣", cat:"商场购物场景"},
-    {fr:"le rayon", ipa:"lə ʁɛjɔ̃", pos:"n.m.", en:"aisle / department", zh:"货架，区域", en2:"ray (of light); radius", zh2:"光线；半径", cat:"商场购物场景"},
-    {fr:"la caisse", ipa:"la kɛs", pos:"n.f.", en:"checkout", zh:"收银台", en2:"crate, box; (slang) car", zh2:"箱子；（俚语）车", cat:"商场购物场景"},
+    {fr:"le rayon", ipa:"lə ʁɛjɔ̃", pos:"n.m.", en:"aisle / department", zh:"货架，区域", en2:"ray (of light); radius", zh2:"光线；半径", ex:"Un rayon de soleil traversait la fenêtre.", exZh:"一缕阳光穿过窗户。", cat:"商场购物场景"},
+    {fr:"la caisse", ipa:"la kɛs", pos:"n.f.", en:"checkout", zh:"收银台", en2:"crate, box; (slang) car", zh2:"箱子；（俚语）车", ex:"Il a chargé des pommes dans une caisse.", exZh:"他把苹果装进一个箱子里。", cat:"商场购物场景"},
     {fr:"le sac", ipa:"lə sak", pos:"n.m.", en:"bag", zh:"袋子", cat:"商场购物场景"},
     {fr:"échanger", ipa:"eʃɑ̃ʒe", pos:"v.", en:"to exchange (goods)", zh:"换货", cat:"商场购物场景"},
     {fr:"rembourser", ipa:"ʁɑ̃buʁse", pos:"v.", en:"to refund", zh:"退款", cat:"商场购物场景"},
@@ -868,16 +924,16 @@
     {fr:"déposer", ipa:"depoze", pos:"v.", en:"to deposit", zh:"存（钱）", cat:"银行与邮局"},
     {fr:"le distributeur", ipa:"lə distʁibytœʁ", pos:"n.m.", en:"ATM", zh:"取款机", cat:"银行与邮局"},
     {fr:"le colis", ipa:"lə kɔli", pos:"n.m.", en:"parcel", zh:"包裹", cat:"银行与邮局"},
-    {fr:"la lettre", ipa:"la lɛtʁ", pos:"n.f.", en:"letter", zh:"信", en2:"letter (of the alphabet)", zh2:"字母", cat:"银行与邮局"},
+    {fr:"la lettre", ipa:"la lɛtʁ", pos:"n.f.", en:"letter", zh:"信", en2:"letter (of the alphabet)", zh2:"字母", ex:"La lettre A est la première de l'alphabet.", exZh:"字母A是字母表的第一个字母。", cat:"银行与邮局"},
     {fr:"le timbre", ipa:"lə tɛ̃bʁ", pos:"n.m.", en:"stamp", zh:"邮票", cat:"银行与邮局"},
     {fr:"expédier", ipa:"ɛkspedje", pos:"v.", en:"to send, ship", zh:"邮寄", cat:"银行与邮局"},
     {fr:"le guichet", ipa:"lə ɡiʃɛ", pos:"n.m.", en:"counter", zh:"柜台", cat:"银行与邮局"},
     {fr:"le code postal", ipa:"lə kɔd pɔstal", pos:"n.m.", en:"postal code", zh:"邮编", cat:"银行与邮局"},
     {fr:"virer", ipa:"viʁe", pos:"v.", en:"to transfer (money)", zh:"转账", cat:"银行与邮局"},
     {fr:"un chèque", ipa:"œ̃ ʃɛk", pos:"n.m.", en:"cheque", zh:"支票", cat:"银行与邮局"},
-    {fr:"le solde", ipa:"lə sɔld", pos:"n.m.", en:"balance", zh:"余额", en2:"clearance sale (usually plural: les soldes)", zh2:"清仓甩卖（常用复数les soldes）", cat:"银行与邮局"},
+    {fr:"le solde", ipa:"lə sɔld", pos:"n.m.", en:"balance", zh:"余额", en2:"clearance sale (usually plural: les soldes)", zh2:"清仓甩卖（常用复数les soldes）", ex:"Ce magasin fait des soldes en janvier.", exZh:"这家店一月份有清仓大甩卖。", cat:"银行与邮局"},
     {fr:"emprunter", ipa:"ɑ̃pʁœ̃te", pos:"v.", en:"to borrow", zh:"借", cat:"银行与邮局"},
-    {fr:"un prêt", ipa:"œ̃ pʁɛ", pos:"n.m.", en:"loan", zh:"贷款", en2:"(as adjective, prêt/prête) ready", zh2:"（作形容词prêt/prête）准备好的", cat:"银行与邮局"},
+    {fr:"un prêt", ipa:"œ̃ pʁɛ", pos:"n.m.", en:"loan", zh:"贷款", en2:"(as adjective, prêt/prête) ready", zh2:"（作形容词prêt/prête）准备好的", ex:"Je suis prêt à partir.", exZh:"我准备好出发了。", cat:"银行与邮局"},
     {fr:"les intérêts", ipa:"lez‿ɛ̃teʁɛ", pos:"n.m.pl.", en:"interest", zh:"利息", cat:"银行与邮局"},
 
     // 自然现象 Phénomènes naturels
@@ -886,12 +942,12 @@
     {fr:"la tempête", ipa:"la tɑ̃pɛt", pos:"n.f.", en:"tempest", zh:"风暴", cat:"自然现象"},
     {fr:"l'humidité", ipa:"lymidite", pos:"n.f.", en:"humidity", zh:"湿度", cat:"自然现象"},
     {fr:"la température", ipa:"la tɑ̃peʁatyʁ", pos:"n.f.", en:"temperature", zh:"温度", cat:"自然现象"},
-    {fr:"le climat", ipa:"lə klima", pos:"n.m.", en:"climate", zh:"气候", en2:"atmosphere, climate (figurative, e.g. of opinion)", zh2:"（比喻）氛围，气氛", cat:"自然现象"},
-    {fr:"un nuage", ipa:"œ̃ nɥaʒ", pos:"n.m.", en:"cloud", zh:"云", en2:"(idiom: être dans les nuages) to be daydreaming, absent-minded", zh2:"（习语être dans les nuages）心不在焉", cat:"自然现象"},
+    {fr:"le climat", ipa:"lə klima", pos:"n.m.", en:"climate", zh:"气候", en2:"atmosphere, climate (figurative, e.g. of opinion)", zh2:"（比喻）氛围，气氛", ex:"Il y a un climat de tension au bureau.", exZh:"办公室里弥漫着紧张气氛。", cat:"自然现象"},
+    {fr:"un nuage", ipa:"œ̃ nɥaʒ", pos:"n.m.", en:"cloud", zh:"云", en2:"(idiom: être dans les nuages) to be daydreaming, absent-minded", zh2:"（习语être dans les nuages）心不在焉", ex:"Il est dans les nuages depuis ce matin.", exZh:"他从今早起就一直心不在焉。", cat:"自然现象"},
     {fr:"la sécheresse", ipa:"la seʃʁɛs", pos:"n.f.", en:"drought", zh:"干旱", cat:"自然现象"},
     {fr:"une inondation", ipa:"yn inɔ̃dasjɔ̃", pos:"n.f.", en:"flood", zh:"洪水", cat:"自然现象"},
     {fr:"un tremblement de terre", ipa:"œ̃ tʁɑ̃bləmɑ̃ də tɛʁ", pos:"n.m.", en:"earthquake", zh:"地震", cat:"自然现象"},
-    {fr:"la glace", ipa:"la ɡlas", pos:"n.f.", en:"ice", zh:"冰", en2:"ice cream; mirror", zh2:"冰淇淋；镜子", cat:"自然现象"},
+    {fr:"la glace", ipa:"la ɡlas", pos:"n.f.", en:"ice", zh:"冰", en2:"ice cream; mirror", zh2:"冰淇淋；镜子", ex:"Les enfants adorent la glace au chocolat.", exZh:"孩子们很喜欢巧克力冰淇淋。", cat:"自然现象"},
     {fr:"la neige", ipa:"la nɛʒ", pos:"n.f.", en:"snow", zh:"雪", cat:"自然现象"},
     {fr:"la pluie", ipa:"la plɥi", pos:"n.f.", en:"rain", zh:"雨", cat:"自然现象"},
     {fr:"l'arc-en-ciel", ipa:"laʁkɑ̃sjɛl", pos:"n.m.", en:"rainbow", zh:"彩虹", cat:"自然现象"},
@@ -923,7 +979,7 @@
     {fr:"un(e) bénévole", ipa:"œ̃ benevɔl", pos:"n.", en:"volunteer", zh:"志愿者", cat:"职业名称"},
 
     // 家居与家具 Meubles et objets de la maison
-    {fr:"une commode", ipa:"yn kɔmɔd", pos:"n.f.", en:"chest of drawers", zh:"五斗橱", en2:"(as adjective, commode) convenient, handy", zh2:"（作形容词）方便的，实用的", cat:"家居与家具"},
+    {fr:"une commode", ipa:"yn kɔmɔd", pos:"n.f.", en:"chest of drawers", zh:"五斗橱", en2:"(as adjective, commode) convenient, handy", zh2:"（作形容词）方便的，实用的", ex:"Cet horaire n'est pas très commode pour moi.", exZh:"这个时间安排对我来说不太方便。", cat:"家居与家具"},
     {fr:"une chaise", ipa:"yn ʃɛz", pos:"n.f.", en:"chair", zh:"椅子", cat:"家居与家具"},
     {fr:"un lit", ipa:"œ̃ li", pos:"n.m.", en:"bed", zh:"床", cat:"家居与家具"},
     {fr:"une armoire", ipa:"yn aʁmwaʁ", pos:"n.f.", en:"wardrobe", zh:"衣柜", cat:"家居与家具"},
@@ -933,11 +989,11 @@
     {fr:"un miroir", ipa:"œ̃ miʁwaʁ", pos:"n.m.", en:"mirror", zh:"镜子", cat:"家居与家具"},
     {fr:"une lampe", ipa:"yn lɑ̃p", pos:"n.f.", en:"lamp", zh:"台灯", cat:"家居与家具"},
     {fr:"un tiroir", ipa:"œ̃ tiʁwaʁ", pos:"n.m.", en:"drawer", zh:"抽屉", cat:"家居与家具"},
-    {fr:"un four", ipa:"œ̃ fuʁ", pos:"n.m.", en:"oven", zh:"烤箱", en2:"(idiom: faire un four) to flop, be a failure", zh2:"（习语faire un four）（演出等）惨败", cat:"家居与家具"},
+    {fr:"un four", ipa:"œ̃ fuʁ", pos:"n.m.", en:"oven", zh:"烤箱", en2:"(idiom: faire un four) to flop, be a failure", zh2:"（习语faire un four）（演出等）惨败", ex:"Le spectacle a été un four total.", exZh:"这场演出彻底失败了。", cat:"家居与家具"},
     {fr:"un réfrigérateur", ipa:"œ̃ ʁefʁiʒeʁatœʁ", pos:"n.m.", en:"refrigerator", zh:"冰箱", cat:"家居与家具"},
     {fr:"une machine à laver", ipa:"yn maʃin a lave", pos:"n.f.", en:"washing machine", zh:"洗衣机", cat:"家居与家具"},
     {fr:"un aspirateur", ipa:"œ̃n‿aspiʁatœʁ", pos:"n.m.", en:"vacuum cleaner", zh:"吸尘器", cat:"家居与家具"},
-    {fr:"un balai", ipa:"œ̃ balɛ", pos:"n.m.", en:"broom", zh:"扫帚", en2:"(slang) year (of age, e.g. avoir 20 balais)", zh2:"（俚语）岁（年龄，如avoir 20 balais）", cat:"家居与家具"},
+    {fr:"un balai", ipa:"œ̃ balɛ", pos:"n.m.", en:"broom", zh:"扫帚", en2:"(slang) year (of age, e.g. avoir 20 balais)", zh2:"（俚语）岁（年龄，如avoir 20 balais）", ex:"Elle a soixante balais cette année.", exZh:"她今年六十岁了（俚语）。", cat:"家居与家具"},
     {fr:"une poubelle", ipa:"yn pubɛl", pos:"n.f.", en:"rubbish bin", zh:"垃圾桶", cat:"家居与家具"},
     {fr:"un rideau", ipa:"œ̃ ʁido", pos:"n.m.", en:"curtain", zh:"窗帘", cat:"家居与家具"},
     {fr:"une horloge", ipa:"yn‿ɔʁlɔʒ", pos:"n.f.", en:"clock", zh:"挂钟", cat:"家居与家具"},
@@ -965,10 +1021,10 @@
     {fr:"une frontière", ipa:"yn fʁɔ̃tjɛʁ", pos:"n.f.", en:"border", zh:"边境", cat:"地理"},
     {fr:"un continent", ipa:"œ̃ kɔ̃tinɑ̃", pos:"n.m.", en:"continent", zh:"大陆", cat:"地理"},
     {fr:"une région", ipa:"yn ʁeʒjɔ̃", pos:"n.f.", en:"region", zh:"地区", cat:"地理"},
-    {fr:"la capitale", ipa:"la kapital", pos:"n.f.", en:"capital city", zh:"首都", en2:"(masculine: le capital) capital (finance, funds)", zh2:"（阳性le capital）资本，资金", cat:"地理"},
-    {fr:"un fleuve", ipa:"œ̃ flœv", pos:"n.m.", en:"(major) river", zh:"大河", en2:"(distinguished from 'rivière': a fleuve flows into the sea)", zh2:"（与rivière的区别：注入海洋的河流）", cat:"地理"},
+    {fr:"la capitale", ipa:"la kapital", pos:"n.f.", en:"capital city", zh:"首都", en2:"(masculine: le capital) capital (finance, funds)", zh2:"（阳性le capital）资本，资金", ex:"Cette start-up a besoin de capital pour se développer.", exZh:"这家初创公司需要资金来发展。", cat:"地理"},
+    {fr:"un fleuve", ipa:"œ̃ flœv", pos:"n.m.", en:"(major) river", zh:"大河", en2:"(distinguished from 'rivière': a fleuve flows into the sea)", zh2:"（与rivière的区别：注入海洋的河流）", ex:"La Seine est un fleuve qui se jette dans la Manche.", exZh:"塞纳河是一条注入英吉利海峡的大河。", cat:"地理"},
     {fr:"une île", ipa:"yn il", pos:"n.f.", en:"island", zh:"岛屿", cat:"地理"},
-    {fr:"une côte", ipa:"yn kot", pos:"n.f.", en:"coast", zh:"海岸", en2:"hill, slope; rib (anatomy)", zh2:"坡；肋骨", cat:"地理"},
+    {fr:"une côte", ipa:"yn kot", pos:"n.f.", en:"coast", zh:"海岸", en2:"hill, slope; rib (anatomy)", zh2:"坡；肋骨", ex:"Il faut monter cette côte à vélo.", exZh:"得骑车爬上这个坡。", cat:"地理"},
     {fr:"le littoral", ipa:"lə litɔʁal", pos:"n.m.", en:"coastline", zh:"沿海地带", cat:"地理"},
     {fr:"une plaine", ipa:"yn plɛn", pos:"n.f.", en:"plain", zh:"平原", cat:"地理"},
     {fr:"une vallée", ipa:"yn vale", pos:"n.f.", en:"valley", zh:"山谷", cat:"地理"},
@@ -979,7 +1035,7 @@
     {fr:"une chaîne de montagnes", ipa:"yn ʃɛn də mɔ̃taɲ", pos:"n.f.", en:"mountain range", zh:"山脉", cat:"地理"},
 
     // 美食与烹饪 Gastronomie et cuisine
-    {fr:"une recette", ipa:"yn ʁəsɛt", pos:"n.f.", en:"recipe", zh:"食谱", en2:"revenue, takings (business)", zh2:"（商业）营业额，收入", cat:"美食与烹饪"},
+    {fr:"une recette", ipa:"yn ʁəsɛt", pos:"n.f.", en:"recipe", zh:"食谱", en2:"revenue, takings (business)", zh2:"（商业）营业额，收入", ex:"Les recettes du magasin ont augmenté ce mois-ci.", exZh:"这家店本月的营业额增加了。", cat:"美食与烹饪"},
     {fr:"un ingrédient", ipa:"œ̃n‿ɛ̃ɡʁedjɑ̃", pos:"n.m.", en:"ingredient", zh:"食材", cat:"美食与烹饪"},
     {fr:"épicé(e)", ipa:"epise", pos:"adj.", en:"spicy", zh:"辣的", cat:"美食与烹饪"},
     {fr:"sucré(e)", ipa:"sykʁe", pos:"adj.", en:"sweet", zh:"甜的", cat:"美食与烹饪"},
@@ -987,7 +1043,7 @@
     {fr:"amer / amère", ipa:"amɛʁ", pos:"adj.", en:"bitter", zh:"苦的", cat:"美食与烹饪"},
     {fr:"savoureux / savoureuse", ipa:"savuʁø", pos:"adj.", en:"tasty", zh:"美味的", cat:"美食与烹饪"},
     {fr:"une portion", ipa:"yn pɔʁsjɔ̃", pos:"n.f.", en:"portion", zh:"份量", cat:"美食与烹饪"},
-    {fr:"un régime alimentaire", ipa:"œ̃ ʁeʒim alimɑ̃tɛʁ", pos:"n.m.", en:"diet", zh:"饮食习惯", en2:"(the word régime alone can also mean a political regime)", zh2:"（régime单独使用也指政权、体制）", cat:"美食与烹饪"},
+    {fr:"un régime alimentaire", ipa:"œ̃ ʁeʒim alimɑ̃tɛʁ", pos:"n.m.", en:"diet", zh:"饮食习惯", en2:"(the word régime alone can also mean a political regime)", zh2:"（régime单独使用也指政权、体制）", ex:"Le régime a changé après les élections.", exZh:"大选之后政权发生了变化。", cat:"美食与烹饪"},
     {fr:"végétarien(ne)", ipa:"veʒetaʁjɛ̃", pos:"adj./n.", en:"vegetarian", zh:"素食的，素食者", cat:"美食与烹饪"},
     {fr:"une allergie alimentaire", ipa:"yn alɛʁʒi alimɑ̃tɛʁ", pos:"n.f.", en:"food allergy", zh:"食物过敏", cat:"美食与烹饪"},
     {fr:"mijoter", ipa:"miʒɔte", pos:"v.", en:"to simmer", zh:"炖煮", cat:"美食与烹饪"},
@@ -998,7 +1054,7 @@
 
     // 经济与商业 Économie et commerce
     {fr:"l'économie", ipa:"lekɔnɔmi", pos:"n.f.", en:"economy", zh:"经济", cat:"经济与商业"},
-    {fr:"le marché", ipa:"lə maʁʃe", pos:"n.m.", en:"market", zh:"市场", en2:"deal, bargain (faire un marché)", zh2:"交易，协议（faire un marché）", cat:"经济与商业"},
+    {fr:"le marché", ipa:"lə maʁʃe", pos:"n.m.", en:"market", zh:"市场", en2:"deal, bargain (faire un marché)", zh2:"交易，协议（faire un marché）", ex:"Ils ont conclu un marché avantageux.", exZh:"他们达成了一笔有利的交易。", cat:"经济与商业"},
     {fr:"la concurrence", ipa:"la kɔ̃kyʁɑ̃s", pos:"n.f.", en:"competition", zh:"竞争", cat:"经济与商业"},
     {fr:"la croissance", ipa:"la kʁwasɑ̃s", pos:"n.f.", en:"growth", zh:"增长", cat:"经济与商业"},
     {fr:"la crise", ipa:"la kʁiz", pos:"n.f.", en:"crisis", zh:"危机", cat:"经济与商业"},
@@ -1032,12 +1088,12 @@
     {fr:"la démocratie", ipa:"la demɔkʁasi", pos:"n.f.", en:"democracy", zh:"民主", cat:"政治与制度"},
     {fr:"un parti politique", ipa:"œ̃ paʁti pɔlitik", pos:"n.m.", en:"political party", zh:"政党", cat:"政治与制度"},
     {fr:"le ministre", ipa:"lə ministʁ", pos:"n.", en:"minister", zh:"部长", cat:"政治与制度"},
-    {fr:"l'État", ipa:"leta", pos:"n.m.", en:"the State", zh:"国家（政体）", en2:"(lowercase, un état) a state, condition", zh2:"（小写un état）状态，情况", cat:"政治与制度"},
+    {fr:"l'État", ipa:"leta", pos:"n.m.", en:"the State", zh:"国家（政体）", en2:"(lowercase, un état) a state, condition", zh2:"（小写un état）状态，情况", ex:"Il est dans un état de fatigue avancé.", exZh:"他处于非常疲惫的状态。", cat:"政治与制度"},
     {fr:"une manifestation", ipa:"yn manifɛstasjɔ̃", pos:"n.f.", en:"demonstration", zh:"示威游行", cat:"政治与制度"},
     {fr:"réformer", ipa:"ʁefɔʁme", pos:"v.", en:"to reform", zh:"改革", cat:"政治与制度"},
     {fr:"un débat public", ipa:"œ̃ deba pyblik", pos:"n.m.", en:"public debate", zh:"公开辩论", cat:"政治与制度"},
     {fr:"la constitution", ipa:"la kɔ̃stitysjɔ̃", pos:"n.f.", en:"constitution", zh:"宪法", cat:"政治与制度"},
-    {fr:"le pouvoir", ipa:"lə puvwaʁ", pos:"n.m.", en:"power", zh:"权力", en2:"(as a verb, pouvoir) to be able to, can", zh2:"（作动词pouvoir）能够，可以", cat:"政治与制度"},
+    {fr:"le pouvoir", ipa:"lə puvwaʁ", pos:"n.m.", en:"power", zh:"权力", en2:"(as a verb, pouvoir) to be able to, can", zh2:"（作动词pouvoir）能够，可以", ex:"Je peux venir demain si tu veux.", exZh:"如果你愿意，我明天可以来。", cat:"政治与制度"},
     {fr:"un scandale", ipa:"œ̃ skɑ̃dal", pos:"n.m.", en:"scandal", zh:"丑闻", cat:"政治与制度"},
     {fr:"la justice", ipa:"la ʒystis", pos:"n.f.", en:"justice", zh:"司法", cat:"政治与制度"},
     {fr:"un tribunal", ipa:"œ̃ tʁibynal", pos:"n.m.", en:"court", zh:"法庭", cat:"政治与制度"},
@@ -1053,11 +1109,11 @@
     {fr:"un cursus", ipa:"œ̃ kyʁsys", pos:"n.m.", en:"course of study", zh:"学业课程", cat:"教育体系"},
     {fr:"la scolarité", ipa:"la skɔlaʁite", pos:"n.f.", en:"schooling", zh:"学业", cat:"教育体系"},
     {fr:"obligatoire", ipa:"ɔbliɡatwaʁ", pos:"adj.", en:"compulsory", zh:"义务的，强制的", cat:"教育体系"},
-    {fr:"une bourse", ipa:"yn buʁs", pos:"n.f.", en:"scholarship", zh:"奖学金", en2:"stock exchange (la Bourse, capitalized); purse", zh2:"证券交易所（大写la Bourse）；钱包", cat:"教育体系"},
+    {fr:"une bourse", ipa:"yn buʁs", pos:"n.f.", en:"scholarship", zh:"奖学金", en2:"stock exchange (la Bourse, capitalized); purse", zh2:"证券交易所（大写la Bourse）；钱包", ex:"Il a investi son argent en bourse.", exZh:"他把钱投资到了股市里。", cat:"教育体系"},
     {fr:"un établissement", ipa:"œ̃n‿etablismɑ̃", pos:"n.m.", en:"institution (school)", zh:"教育机构", cat:"教育体系"},
     {fr:"encadrer", ipa:"ɑ̃kadʁe", pos:"v.", en:"to supervise, mentor", zh:"指导，带教", cat:"教育体系"},
     {fr:"évaluer", ipa:"evalɥe", pos:"v.", en:"to assess", zh:"评估", cat:"教育体系"},
-    {fr:"la rentrée", ipa:"la ʁɑ̃tʁe", pos:"n.f.", en:"back to school", zh:"开学", en2:"(broader) the post-summer return (to work, politics, etc.)", zh2:"（泛指）暑假后复工/开学季", cat:"教育体系"},
+    {fr:"la rentrée", ipa:"la ʁɑ̃tʁe", pos:"n.f.", en:"back to school", zh:"开学", en2:"(broader) the post-summer return (to work, politics, etc.)", zh2:"（泛指）暑假后复工/开学季", ex:"La rentrée politique s'annonce mouvementée.", exZh:"政坛的暑期后复工看起来将会很动荡。", cat:"教育体系"},
     {fr:"acquérir des compétences", ipa:"akeʁiʁ de kɔ̃petɑ̃s", pos:"loc.v.", en:"to acquire skills", zh:"掌握技能", cat:"教育体系"},
     {fr:"le niveau", ipa:"lə nivo", pos:"n.m.", en:"level", zh:"水平", cat:"教育体系"},
     {fr:"un diplômé / une diplômée", ipa:"œ̃ diplome", pos:"n.", en:"graduate", zh:"毕业生", cat:"教育体系"},
@@ -1074,7 +1130,7 @@
     {fr:"se rétablir", ipa:"sə ʁetabliʁ", pos:"v.", en:"to recover", zh:"康复", cat:"医学与健康"},
     {fr:"une consultation", ipa:"yn kɔ̃syltasjɔ̃", pos:"n.f.", en:"medical consultation", zh:"就诊", cat:"医学与健康"},
     {fr:"l'assurance maladie", ipa:"lasyʁɑ̃s maladi", pos:"n.f.", en:"health insurance", zh:"医疗保险", cat:"医学与健康"},
-    {fr:"un traitement", ipa:"œ̃ tʁɛtmɑ̃", pos:"n.m.", en:"treatment", zh:"治疗", en2:"salary (formal, e.g. of a civil servant)", zh2:"薪资（正式用语，如公务员工资）", cat:"医学与健康"},
+    {fr:"un traitement", ipa:"œ̃ tʁɛtmɑ̃", pos:"n.m.", en:"treatment", zh:"治疗", en2:"salary (formal, e.g. of a civil servant)", zh2:"薪资（正式用语，如公务员工资）", ex:"Son traitement mensuel a augmenté cette année.", exZh:"他今年的月薪涨了。", cat:"医学与健康"},
     {fr:"une ordonnance", ipa:"yn‿ɔʁdɔnɑ̃s", pos:"n.f.", en:"prescription", zh:"处方", cat:"医学与健康"},
     {fr:"soigner", ipa:"swaɲe", pos:"v.", en:"to treat, care for", zh:"治疗，照顾", cat:"医学与健康"},
     {fr:"un(e) patient(e)", ipa:"œ̃ pasjɑ̃", pos:"n.", en:"patient", zh:"病人", cat:"医学与健康"},
@@ -1101,7 +1157,7 @@
     {fr:"la création", ipa:"la kʁeasjɔ̃", pos:"n.f.", en:"creation", zh:"创作", cat:"艺术与文化"},
     {fr:"inspirer", ipa:"ɛ̃spiʁe", pos:"v.", en:"to inspire", zh:"启发", cat:"艺术与文化"},
     {fr:"un chef-d'œuvre", ipa:"œ̃ ʃɛdœvʁ", pos:"n.m.", en:"masterpiece", zh:"杰作", cat:"艺术与文化"},
-    {fr:"la critique", ipa:"la kʁitik", pos:"n.f.", en:"criticism, review", zh:"评论", en2:"a critic (person; masculine: le critique)", zh2:"评论家（指人；阳性le critique）", cat:"艺术与文化"},
+    {fr:"la critique", ipa:"la kʁitik", pos:"n.f.", en:"criticism, review", zh:"评论", en2:"a critic (person; masculine: le critique)", zh2:"评论家（指人；阳性le critique）", ex:"Ce critique a écrit un article sévère.", exZh:"这位评论家写了一篇严厉的评论文章。", cat:"艺术与文化"},
     {fr:"populaire", ipa:"pɔpylɛʁ", pos:"adj.", en:"popular", zh:"流行的，大众的", cat:"艺术与文化"},
 
     // 科学与研究 Sciences et recherche
@@ -1153,7 +1209,7 @@
     {fr:"un progrès", ipa:"œ̃ pʁɔɡʁɛ", pos:"n.m.", en:"progress", zh:"进步", cat:"论说抽象词"},
     {fr:"une tendance", ipa:"yn tɑ̃dɑ̃s", pos:"n.f.", en:"trend", zh:"趋势", cat:"论说抽象词"},
     {fr:"un impact", ipa:"œ̃n‿ɛ̃pakt", pos:"n.m.", en:"impact", zh:"影响", cat:"论说抽象词"},
-    {fr:"une mesure", ipa:"yn məzyʁ", pos:"n.f.", en:"measure (action taken)", zh:"措施", en2:"measurement; musical time, rhythm (en mesure)", zh2:"测量；（音乐）节拍（en mesure）", cat:"论说抽象词"},
+    {fr:"une mesure", ipa:"yn məzyʁ", pos:"n.f.", en:"measure (action taken)", zh:"措施", en2:"measurement; musical time, rhythm (en mesure)", zh2:"测量；（音乐）节拍（en mesure）", ex:"Le musicien garde bien la mesure.", exZh:"这位音乐家节拍把握得很好。", cat:"论说抽象词"},
     {fr:"une priorité", ipa:"yn pʁijɔʁite", pos:"n.f.", en:"priority", zh:"优先事项", cat:"论说抽象词"},
     {fr:"un principe", ipa:"œ̃ pʁɛ̃sip", pos:"n.m.", en:"principle", zh:"原则", cat:"论说抽象词"},
     {fr:"une exigence", ipa:"yn‿ɛɡziʒɑ̃s", pos:"n.f.", en:"requirement", zh:"要求", cat:"论说抽象词"},
@@ -1190,7 +1246,7 @@
     {fr:"un panneau", ipa:"œ̃ pano", pos:"n.m.", en:"sign, billboard", zh:"标牌", cat:"城市生活进阶"},
     {fr:"un trottoir", ipa:"œ̃ tʁɔtwaʁ", pos:"n.m.", en:"pavement", zh:"人行道", cat:"城市生活进阶"},
     {fr:"une place publique", ipa:"yn plas pyblik", pos:"n.f.", en:"public square", zh:"广场", cat:"城市生活进阶"},
-    {fr:"un chantier", ipa:"œ̃ ʃɑ̃tje", pos:"n.m.", en:"construction site", zh:"施工现场", en2:"(figurative) a mess, a big undertaking", zh2:"（比喻）一团糟，浩大的工程", cat:"城市生活进阶"},
+    {fr:"un chantier", ipa:"œ̃ ʃɑ̃tje", pos:"n.m.", en:"construction site", zh:"施工现场", en2:"(figurative) a mess, a big undertaking", zh2:"（比喻）一团糟，浩大的工程", ex:"Sa chambre est un vrai chantier !", exZh:"他的房间简直是一团糟！", cat:"城市生活进阶"},
     {fr:"l'urbanisme", ipa:"lyʁbanism", pos:"n.m.", en:"urban planning", zh:"城市规划", cat:"城市生活进阶"},
     {fr:"le maire", ipa:"lə mɛʁ", pos:"n.m.", en:"mayor", zh:"市长", cat:"城市生活进阶"},
     {fr:"un(e) habitant(e)", ipa:"œ̃n‿abitɑ̃", pos:"n.", en:"inhabitant", zh:"居民", cat:"城市生活进阶"},
@@ -1228,7 +1284,7 @@
     {fr:"accélérer", ipa:"akselere", pos:"v.", en:"to accelerate", zh:"加速", cat:"交通进阶"},
     {fr:"garer", ipa:"ɡaʁe", pos:"v.", en:"to park", zh:"停车", cat:"交通进阶"},
     {fr:"un parking", ipa:"œ̃ paʁkiŋ", pos:"n.m.", en:"car park", zh:"停车场", cat:"交通进阶"},
-    {fr:"la circulation", ipa:"la siʁkylasjɔ̃", pos:"n.f.", en:"traffic", zh:"交通（车流）", en2:"circulation (e.g., blood)", zh2:"（血液等）循环", cat:"交通进阶"},
+    {fr:"la circulation", ipa:"la siʁkylasjɔ̃", pos:"n.f.", en:"traffic", zh:"交通（车流）", en2:"circulation (e.g., blood)", zh2:"（血液等）循环", ex:"Le médecin a vérifié sa circulation sanguine.", exZh:"医生检查了他的血液循环。", cat:"交通进阶"},
     {fr:"une panne", ipa:"yn pan", pos:"n.f.", en:"breakdown", zh:"故障", cat:"交通进阶"},
     {fr:"un accident", ipa:"œ̃n‿aksidɑ̃", pos:"n.m.", en:"accident", zh:"事故", cat:"交通进阶"},
     {fr:"assurer (une voiture)", ipa:"asyʁe", pos:"v.", en:"to insure (a car)", zh:"给（车）投保", cat:"交通进阶"},
@@ -1314,7 +1370,7 @@
     {fr:"l'inclusion", ipa:"lɛ̃klyzjɔ̃", pos:"n.f.", en:"inclusion", zh:"包容，纳入", cat:"性别与平等"},
 
     // 犯罪与法律 Crime et justice
-    {fr:"un vol", ipa:"œ̃ vɔl", pos:"n.m.", en:"theft", zh:"盗窃", en2:"flight (aviation)", zh2:"航班（航空）", cat:"犯罪与法律"},
+    {fr:"un vol", ipa:"œ̃ vɔl", pos:"n.m.", en:"theft", zh:"盗窃", en2:"flight (aviation)", zh2:"航班（航空）", ex:"Le vol Paris-Tokyo a été retardé.", exZh:"巴黎到东京的航班延误了。", cat:"犯罪与法律"},
     {fr:"voler", ipa:"vɔle", pos:"v.", en:"to steal", zh:"偷", cat:"犯罪与法律"},
     {fr:"un(e) voleur/euse", ipa:"œ̃ vɔlœʁ", pos:"n.", en:"thief", zh:"小偷", cat:"犯罪与法律"},
     {fr:"cambrioler", ipa:"kɑ̃bʁijɔle", pos:"v.", en:"to burgle", zh:"入室盗窃", cat:"犯罪与法律"},
@@ -1336,24 +1392,24 @@
     {fr:"prévenir la délinquance", ipa:"pʁevəniʁ la delɛ̃kɑ̃s", pos:"loc.v.", en:"to prevent delinquency", zh:"预防犯罪", cat:"犯罪与法律"},
 
     // 惯用表达三 Expressions idiomatiques (3)
-    {fr:"avoir le cafard", ipa:"avwaʁ lə kafaʁ", pos:"loc.v.", en:"to feel down, blue (literally 'to have the cockroach')", zh:"感到沮丧（俚语，字面意为“有只蟑螂”）", cat:"惯用表达三"},
-    {fr:"coûter les yeux de la tête", ipa:"kute lez‿jø də la tɛt", pos:"loc.v.", en:"to cost a fortune", zh:"贵得离谱", cat:"惯用表达三"},
-    {fr:"avoir un coup de foudre", ipa:"avwaʁ œ̃ ku də fudʁ", pos:"loc.v.", en:"love at first sight (literally 'to have a lightning strike')", zh:"一见钟情（字面意为“遭雷击”）", cat:"惯用表达三"},
-    {fr:"casser les pieds à quelqu'un", ipa:"kase le pje a kɛlkœ̃", pos:"loc.v.", en:"to annoy someone (literally 'to break someone's feet')", zh:"惹恼某人（字面意为“打断某人的脚”）", cat:"惯用表达三"},
-    {fr:"mettre les pieds dans le plat", ipa:"mɛtʁ le pje dɑ̃ lə pla", pos:"loc.v.", en:"to put one's foot in it (literally 'to put one's feet in the dish')", zh:"说错话，闯祸（字面意为“把脚放进菜盘里”）", cat:"惯用表达三"},
-    {fr:"poser un lapin à quelqu'un", ipa:"poze œ̃ lapɛ̃ a kɛlkœ̃", pos:"loc.v.", en:"to stand someone up (literally 'to put a rabbit on someone')", zh:"放某人鸽子（字面意为“给某人放只兔子”，法语用兔子，英语才用鸽子）", cat:"惯用表达三"},
-    {fr:"avoir la pêche", ipa:"avwaʁ la pɛʃ", pos:"loc.v.", en:"to feel great, energetic", zh:"精力充沛（俚语）", cat:"惯用表达三"},
-    {fr:"tomber dans les pommes", ipa:"tɔ̃be dɑ̃ le pɔm", pos:"loc.v.", en:"to faint (literally 'to fall into the apples')", zh:"昏倒（字面意为“摔进苹果堆里”）", cat:"惯用表达三"},
-    {fr:"avoir un chat dans la gorge", ipa:"avwaʁ œ̃ ʃa dɑ̃ la ɡɔʁʒ", pos:"loc.v.", en:"to have a frog in one's throat (literally 'to have a cat in one's throat' — French uses a cat where English uses a frog)", zh:"嗓子哑了（字面意为“喉咙里有只猫”，法语用猫、英语用青蛙表达同一意思）", cat:"惯用表达三"},
-    {fr:"être dans de beaux draps", ipa:"ɛtʁ dɑ̃ də bo dʁa", pos:"loc.v.", en:"to be in a fix", zh:"陷入困境", cat:"惯用表达三"},
-    {fr:"avoir la tête dans les nuages", ipa:"avwaʁ la tɛt dɑ̃ le nɥaʒ", pos:"loc.v.", en:"to be daydreaming", zh:"心不在焉", cat:"惯用表达三"},
-    {fr:"donner sa langue au chat", ipa:"dɔne sa lɑ̃ɡ o ʃa", pos:"loc.v.", en:"to give up guessing (literally 'to give one's tongue to the cat')", zh:"承认猜不出来（字面意为“把舌头交给猫”）", cat:"惯用表达三"},
-    {fr:"avoir d'autres chats à fouetter", ipa:"avwaʁ dotʁ ʃa a fwete", pos:"loc.v.", en:"to have other things to worry about", zh:"还有别的事要忙", cat:"惯用表达三"},
-    {fr:"filer à l'anglaise", ipa:"file a lɑ̃ɡlɛz", pos:"loc.v.", en:"to leave without saying goodbye (literally 'to leave in the English style' — amusingly, English speakers call the same thing 'to take French leave')", zh:"不辞而别（字面意为“以英国人的方式离开”，有趣的是英语里同样的说法叫“法式告别”）", cat:"惯用表达三"},
-    {fr:"mettre la charrue avant les bœufs", ipa:"mɛtʁ la ʃaʁy avɑ̃ le bø", pos:"loc.v.", en:"to put the cart before the horse (literally 'to put the plough before the oxen')", zh:"本末倒置（字面意为“把犁放在牛前面”）", cat:"惯用表达三"},
-    {fr:"ne pas avoir la langue dans sa poche", ipa:"nə pa avwaʁ la lɑ̃ɡ dɑ̃ sa pɔʃ", pos:"loc.v.", en:"to be outspoken", zh:"说话直率，不怕说", cat:"惯用表达三"},
-    {fr:"tourner autour du pot", ipa:"tuʁne otuʁ dy po", pos:"loc.v.", en:"to beat around the bush", zh:"拐弯抹角", cat:"惯用表达三"},
-    {fr:"avoir le cœur sur la main", ipa:"avwaʁ lə kœʁ syʁ la mɛ̃", pos:"loc.v.", en:"to be generous, big-hearted (literally 'to have one's heart on one's hand')", zh:"慷慨大方（字面意为“把心放在手上”）", cat:"惯用表达三"},
+    {fr:"avoir le cafard", ipa:"avwaʁ lə kafaʁ", pos:"loc.v.", en:"to feel down, blue (literally 'to have the cockroach')", zh:"感到沮丧（俚语，字面意为“有只蟑螂”）", ex:"Depuis son départ, j'ai le cafard.", exZh:"自从他走了之后，我一直很沮丧。", cat:"惯用表达三"},
+    {fr:"coûter les yeux de la tête", ipa:"kute lez‿jø də la tɛt", pos:"loc.v.", en:"to cost a fortune", zh:"贵得离谱", ex:"Cette voiture coûte les yeux de la tête.", exZh:"这辆车贵得离谱。", cat:"惯用表达三"},
+    {fr:"avoir un coup de foudre", ipa:"avwaʁ œ̃ ku də fudʁ", pos:"loc.v.", en:"love at first sight (literally 'to have a lightning strike')", zh:"一见钟情（字面意为“遭雷击”）", ex:"Ils ont eu un coup de foudre l'un pour l'autre.", exZh:"他们对彼此一见钟情。", cat:"惯用表达三"},
+    {fr:"casser les pieds à quelqu'un", ipa:"kase le pje a kɛlkœ̃", pos:"loc.v.", en:"to annoy someone (literally 'to break someone's feet')", zh:"惹恼某人（字面意为“打断某人的脚”）", ex:"Arrête de me casser les pieds avec ça !", exZh:"别再拿这事烦我了！", cat:"惯用表达三"},
+    {fr:"mettre les pieds dans le plat", ipa:"mɛtʁ le pje dɑ̃ lə pla", pos:"loc.v.", en:"to put one's foot in it (literally 'to put one's feet in the dish')", zh:"说错话，闯祸（字面意为“把脚放进菜盘里”）", ex:"Il a encore mis les pieds dans le plat pendant la réunion.", exZh:"他在会议上又说错话了。", cat:"惯用表达三"},
+    {fr:"poser un lapin à quelqu'un", ipa:"poze œ̃ lapɛ̃ a kɛlkœ̃", pos:"loc.v.", en:"to stand someone up (literally 'to put a rabbit on someone')", zh:"放某人鸽子（字面意为“给某人放只兔子”，法语用兔子，英语才用鸽子）", ex:"Elle m'a posé un lapin hier soir.", exZh:"她昨晚放了我鸽子。", cat:"惯用表达三"},
+    {fr:"avoir la pêche", ipa:"avwaʁ la pɛʃ", pos:"loc.v.", en:"to feel great, energetic", zh:"精力充沛（俚语）", ex:"Ce matin, j'ai vraiment la pêche !", exZh:"今天早上我精力充沛！", cat:"惯用表达三"},
+    {fr:"tomber dans les pommes", ipa:"tɔ̃be dɑ̃ le pɔm", pos:"loc.v.", en:"to faint (literally 'to fall into the apples')", zh:"昏倒（字面意为“摔进苹果堆里”）", ex:"Elle est tombée dans les pommes à cause de la chaleur.", exZh:"她因为天热昏倒了。", cat:"惯用表达三"},
+    {fr:"avoir un chat dans la gorge", ipa:"avwaʁ œ̃ ʃa dɑ̃ la ɡɔʁʒ", pos:"loc.v.", en:"to have a frog in one's throat (literally 'to have a cat in one's throat' — French uses a cat where English uses a frog)", zh:"嗓子哑了（字面意为“喉咙里有只猫”，法语用猫、英语用青蛙表达同一意思）", ex:"Excusez-moi, j'ai un chat dans la gorge.", exZh:"不好意思，我嗓子有点哑。", cat:"惯用表达三"},
+    {fr:"être dans de beaux draps", ipa:"ɛtʁ dɑ̃ də bo dʁa", pos:"loc.v.", en:"to be in a fix", zh:"陷入困境", ex:"Sans argent, nous sommes dans de beaux draps.", exZh:"没了钱，我们真是陷入困境了。", cat:"惯用表达三"},
+    {fr:"avoir la tête dans les nuages", ipa:"avwaʁ la tɛt dɑ̃ le nɥaʒ", pos:"loc.v.", en:"to be daydreaming", zh:"心不在焉", ex:"Il a toujours la tête dans les nuages en classe.", exZh:"他上课时总是心不在焉。", cat:"惯用表达三"},
+    {fr:"donner sa langue au chat", ipa:"dɔne sa lɑ̃ɡ o ʃa", pos:"loc.v.", en:"to give up guessing (literally 'to give one's tongue to the cat')", zh:"承认猜不出来（字面意为“把舌头交给猫”）", ex:"Je donne ma langue au chat, quelle est la réponse ?", exZh:"我猜不出来了，答案是什么？", cat:"惯用表达三"},
+    {fr:"avoir d'autres chats à fouetter", ipa:"avwaʁ dotʁ ʃa a fwete", pos:"loc.v.", en:"to have other things to worry about", zh:"还有别的事要忙", ex:"Désolé, j'ai d'autres chats à fouetter aujourd'hui.", exZh:"抱歉，我今天还有别的事要处理。", cat:"惯用表达三"},
+    {fr:"filer à l'anglaise", ipa:"file a lɑ̃ɡlɛz", pos:"loc.v.", en:"to leave without saying goodbye (literally 'to leave in the English style' — amusingly, English speakers call the same thing 'to take French leave')", zh:"不辞而别（字面意为“以英国人的方式离开”，有趣的是英语里同样的说法叫“法式告别”）", ex:"Il a filé à l'anglaise avant la fin de la fête.", exZh:"他在派对结束前就悄悄溜走了。", cat:"惯用表达三"},
+    {fr:"mettre la charrue avant les bœufs", ipa:"mɛtʁ la ʃaʁy avɑ̃ le bø", pos:"loc.v.", en:"to put the cart before the horse (literally 'to put the plough before the oxen')", zh:"本末倒置（字面意为“把犁放在牛前面”）", ex:"Ne mettons pas la charrue avant les bœufs.", exZh:"我们别本末倒置了。", cat:"惯用表达三"},
+    {fr:"ne pas avoir la langue dans sa poche", ipa:"nə pa avwaʁ la lɑ̃ɡ dɑ̃ sa pɔʃ", pos:"loc.v.", en:"to be outspoken", zh:"说话直率，不怕说", ex:"Elle n'a pas la langue dans sa poche, elle dit toujours ce qu'elle pense.", exZh:"她说话很直，总是有话直说。", cat:"惯用表达三"},
+    {fr:"tourner autour du pot", ipa:"tuʁne otuʁ dy po", pos:"loc.v.", en:"to beat around the bush", zh:"拐弯抹角", ex:"Arrête de tourner autour du pot et dis-moi la vérité.", exZh:"别拐弯抹角了，告诉我真相。", cat:"惯用表达三"},
+    {fr:"avoir le cœur sur la main", ipa:"avwaʁ lə kœʁ syʁ la mɛ̃", pos:"loc.v.", en:"to be generous, big-hearted (literally 'to have one's heart on one's hand')", zh:"慷慨大方（字面意为“把心放在手上”）", ex:"Mon grand-père a toujours eu le cœur sur la main.", exZh:"我爷爷一直都很慷慨大方。", cat:"惯用表达三"},
 
     // 职业名称二 Les métiers (2)
     {fr:"un(e) professeur(e) des écoles", ipa:"œ̃ pʁɔfesœʁ dez‿ekɔl", pos:"n.", en:"primary school teacher", zh:"小学教师", cat:"职业名称二"},
@@ -1758,7 +1814,7 @@
     {fr:"le piano", ipa:"lə pjano", pos:"n.m.", en:"piano", zh:"钢琴", cat:"乐器与音乐理论"},
     {fr:"la guitare", ipa:"la ɡitaʁ", pos:"n.f.", en:"guitar", zh:"吉他", cat:"乐器与音乐理论"},
     {fr:"le violon", ipa:"lə vjɔlɔ̃", pos:"n.m.", en:"violin", zh:"小提琴", cat:"乐器与音乐理论"},
-    {fr:"la batterie", ipa:"la batʁi", pos:"n.f.", en:"drum kit", zh:"架子鼓", en2:"battery (car/device)", zh2:"电池（汽车/设备）", cat:"乐器与音乐理论"},
+    {fr:"la batterie", ipa:"la batʁi", pos:"n.f.", en:"drum kit", zh:"架子鼓", en2:"battery (car/device)", zh2:"电池（汽车/设备）", ex:"La batterie de sa voiture est à plat.", exZh:"他车的电池没电了。", cat:"乐器与音乐理论"},
     {fr:"une chanson", ipa:"yn ʃɑ̃sɔ̃", pos:"n.f.", en:"song", zh:"歌曲", cat:"乐器与音乐理论"},
     {fr:"un(e) chanteur/euse", ipa:"œ̃ ʃɑ̃tœʁ", pos:"n.", en:"singer", zh:"歌手", cat:"乐器与音乐理论"},
     {fr:"un orchestre", ipa:"œ̃n‿ɔʁkɛstʁ", pos:"n.m.", en:"orchestra", zh:"管弦乐团", cat:"乐器与音乐理论"},
@@ -1863,7 +1919,7 @@
     {fr:"un référendum", ipa:"œ̃ ʁefeʁɛ̃dɔm", pos:"n.m.", en:"referendum", zh:"公投", cat:"政治词二"},
     {fr:"la majorité", ipa:"la maʒɔʁite", pos:"n.f.", en:"majority", zh:"多数", cat:"政治词二"},
     {fr:"l'opposition", ipa:"lɔpozisjɔ̃", pos:"n.f.", en:"opposition (political)", zh:"反对党，反对派", cat:"政治词二"},
-    {fr:"un mandat", ipa:"œ̃ mɑ̃da", pos:"n.m.", en:"term of office", zh:"任期", en2:"money order; (legal) warrant", zh2:"汇票；（法律）委托书，逮捕令", cat:"政治词二"},
+    {fr:"un mandat", ipa:"œ̃ mɑ̃da", pos:"n.m.", en:"term of office", zh:"任期", en2:"money order; (legal) warrant", zh2:"汇票；（法律）委托书，逮捕令", ex:"Elle a envoyé l'argent par mandat postal.", exZh:"她通过邮政汇票寄了钱。", cat:"政治词二"},
     {fr:"un(e) élu(e)", ipa:"œ̃n‿ely", pos:"n.", en:"elected official", zh:"当选官员", cat:"政治词二"},
     {fr:"le vote blanc", ipa:"lə vɔt blɑ̃", pos:"n.m.", en:"blank vote", zh:"空白票", cat:"政治词二"},
     {fr:"l'abstention", ipa:"lapstɑ̃sjɔ̃", pos:"n.f.", en:"abstention (not voting)", zh:"弃权（不投票）", cat:"政治词二"},
@@ -2113,7 +2169,7 @@
     {fr:"un scoop", ipa:"œ̃ skup", pos:"n.m.", en:"scoop (news)", zh:"独家新闻", cat:"新闻媒体类型"},
     {fr:"une dépêche", ipa:"yn depɛʃ", pos:"n.f.", en:"news dispatch", zh:"快讯", cat:"新闻媒体类型"},
     {fr:"un article de presse", ipa:"œ̃n‿aʁtikl də pʁɛs", pos:"n.m.", en:"press article", zh:"新闻文章", cat:"新闻媒体类型"},
-    {fr:"un titre", ipa:"œ̃ titʁ", pos:"n.m.", en:"headline", zh:"标题", en2:"title (of a book, an academic degree); a security (finance)", zh2:"（书籍、学位）头衔；证券（金融）", cat:"新闻媒体类型"},
+    {fr:"un titre", ipa:"œ̃ titʁ", pos:"n.m.", en:"headline", zh:"标题", en2:"title (of a book, an academic degree); a security (finance)", zh2:"（书籍、学位）头衔；证券（金融）", ex:"Il a obtenu un titre d'ingénieur.", exZh:"他获得了工程师的头衔。", cat:"新闻媒体类型"},
     {fr:"une source d'information", ipa:"yn suʁs dɛ̃fɔʁmasjɔ̃", pos:"n.f.", en:"news source", zh:"信息来源", cat:"新闻媒体类型"},
     {fr:"vérifier les faits", ipa:"veʁifje le fɛ", pos:"loc.v.", en:"to fact-check", zh:"核实事实", cat:"新闻媒体类型"},
     {fr:"une fake news", ipa:"yn fɛjk njuz", pos:"n.f.", en:"fake news", zh:"假新闻", cat:"新闻媒体类型"},
@@ -2172,7 +2228,7 @@
     {fr:"une prime d'assurance", ipa:"yn pʁim dasyʁɑ̃s", pos:"n.f.", en:"insurance premium", zh:"保费", cat:"保险"},
     {fr:"un sinistre", ipa:"œ̃ sinistʁ", pos:"n.m.", en:"claim (insurance incident)", zh:"保险事故，理赔事项", cat:"保险"},
     {fr:"couvrir un risque", ipa:"kuvʁiʁ œ̃ ʁisk", pos:"loc.v.", en:"to cover a risk", zh:"承保风险", cat:"保险"},
-    {fr:"une franchise", ipa:"yn fʁɑ̃ʃiz", pos:"n.f.", en:"deductible (insurance)", zh:"免赔额", en2:"franchise (business)", zh2:"特许经营权", cat:"保险"},
+    {fr:"une franchise", ipa:"yn fʁɑ̃ʃiz", pos:"n.f.", en:"deductible (insurance)", zh:"免赔额", en2:"franchise (business)", zh2:"特许经营权", ex:"Cette chaîne de restaurants vend des franchises.", exZh:"这家连锁餐厅出售特许经营权。", cat:"保险"},
     {fr:"souscrire une assurance", ipa:"suskʁiʁ yn asyʁɑ̃s", pos:"loc.v.", en:"to take out insurance", zh:"投保", cat:"保险"},
     {fr:"résilier une assurance", ipa:"ʁezilje yn asyʁɑ̃s", pos:"loc.v.", en:"to cancel an insurance policy", zh:"解除保险合同", cat:"保险"},
     {fr:"un assuré / une assurée", ipa:"œ̃n‿asyʁe", pos:"n.", en:"policyholder", zh:"投保人", cat:"保险"},
@@ -2676,16 +2732,16 @@
     {fr:"prendre une photo", ipa:"pʁɑ̃dʁ yn foto", pos:"loc.v.", en:"to take a photo", zh:"拍照", cat:"摄影"},
     {fr:"un appareil photo", ipa:"œ̃n‿apaʁɛj foto", pos:"n.m.", en:"camera", zh:"相机", cat:"摄影"},
     {fr:"zoomer", ipa:"zoome", pos:"v.", en:"to zoom in", zh:"拉近镜头", cat:"摄影"},
-    {fr:"la mise au point", ipa:"la miz o pwɛ̃", pos:"n.f.", en:"focus (photography)", zh:"对焦", en2:"clarification, briefing (general use)", zh2:"（泛指）澄清，说明情况", cat:"摄影"},
-    {fr:"flou(e)", ipa:"flu", pos:"adj.", en:"blurry", zh:"模糊的", en2:"(figurative) vague, unclear (statements, plans)", zh2:"（比喻）模糊的，不明确的（言辞、计划）", cat:"摄影"},
-    {fr:"net(te)", ipa:"nɛt", pos:"adj.", en:"sharp, clear (image)", zh:"清晰的", en2:"net (income/weight — opposite of gross)", zh2:"净的（收入、重量，与“毛”相对）", cat:"摄影"},
-    {fr:"un cliché", ipa:"œ̃ kliʃe", pos:"n.m.", en:"a shot, snapshot", zh:"一张照片", en2:"a cliché, stereotype (the more common everyday meaning)", zh2:"陈词滥调，刻板印象（日常更常用的含义）", cat:"摄影"},
+    {fr:"la mise au point", ipa:"la miz o pwɛ̃", pos:"n.f.", en:"focus (photography)", zh:"对焦", en2:"clarification, briefing (general use)", zh2:"（泛指）澄清，说明情况", ex:"Le ministre a fait une mise au point sur ce sujet.", exZh:"部长就这个话题做了澄清说明。", cat:"摄影"},
+    {fr:"flou(e)", ipa:"flu", pos:"adj.", en:"blurry", zh:"模糊的", en2:"(figurative) vague, unclear (statements, plans)", zh2:"（比喻）模糊的，不明确的（言辞、计划）", ex:"Ses explications restent assez floues.", exZh:"他的解释还是相当含糊。", cat:"摄影"},
+    {fr:"net(te)", ipa:"nɛt", pos:"adj.", en:"sharp, clear (image)", zh:"清晰的", en2:"net (income/weight — opposite of gross)", zh2:"净的（收入、重量，与“毛”相对）", ex:"Son salaire net est plus bas que le brut.", exZh:"他的税后工资比税前低。", cat:"摄影"},
+    {fr:"un cliché", ipa:"œ̃ kliʃe", pos:"n.m.", en:"a shot, snapshot", zh:"一张照片", en2:"a cliché, stereotype (the more common everyday meaning)", zh2:"陈词滥调，刻板印象（日常更常用的含义）", ex:"Dire que les Français mangent des croissants tous les jours est un cliché.", exZh:"说法国人每天都吃牛角面包是一种刻板印象。", cat:"摄影"},
     {fr:"retoucher une photo", ipa:"ʁətuʃe yn foto", pos:"loc.v.", en:"to edit, retouch a photo", zh:"修图", cat:"摄影"},
     {fr:"un(e) photographe", ipa:"œ̃ fɔtɔɡʁaf", pos:"n.", en:"photographer", zh:"摄影师", cat:"摄影"},
     {fr:"un cadrage", ipa:"œ̃ kadʁaʒ", pos:"n.m.", en:"framing (photo composition)", zh:"取景，构图", cat:"摄影"},
     {fr:"la lumière naturelle", ipa:"la lymjɛʁ natyʁɛl", pos:"n.f.", en:"natural light", zh:"自然光", cat:"摄影"},
     {fr:"un trépied", ipa:"œ̃ tʁepje", pos:"n.m.", en:"tripod", zh:"三脚架", cat:"摄影"},
-    {fr:"un flash", ipa:"œ̃ flaʃ", pos:"n.m.", en:"flash (camera)", zh:"闪光灯", en2:"news flash", zh2:"新闻快讯", cat:"摄影"},
+    {fr:"un flash", ipa:"œ̃ flaʃ", pos:"n.m.", en:"flash (camera)", zh:"闪光灯", en2:"news flash", zh2:"新闻快讯", ex:"Un flash spécial a interrompu l'émission.", exZh:"一条特别新闻快讯打断了节目。", cat:"摄影"},
 
     // 烹饪方式 Modes de cuisson
     {fr:"cuire", ipa:"kɥiʁ", pos:"v.", en:"to cook (general)", zh:"烹煮", cat:"烹饪方式"},
@@ -2791,7 +2847,7 @@
     {fr:"créer une entreprise", ipa:"kʁee yn‿ɑ̃tʁəpʁiz", pos:"loc.v.", en:"to start a business", zh:"创办企业", cat:"创业与初创企业"},
     {fr:"une idée innovante", ipa:"yn‿ide inɔvɑ̃t", pos:"n.f.", en:"innovative idea", zh:"创新想法", cat:"创业与初创企业"},
     {fr:"le capital-risque", ipa:"lə kapitalʁisk", pos:"n.m.", en:"venture capital", zh:"风险投资", cat:"创业与初创企业"},
-    {fr:"un incubateur", ipa:"œ̃n‿ɛ̃kybatœʁ", pos:"n.m.", en:"business incubator", zh:"孵化器", en2:"incubator (medical, for premature babies)", zh2:"（医学）保温箱，早产儿培养箱", cat:"创业与初创企业"},
+    {fr:"un incubateur", ipa:"œ̃n‿ɛ̃kybatœʁ", pos:"n.m.", en:"business incubator", zh:"孵化器", en2:"incubator (medical, for premature babies)", zh2:"（医学）保温箱，早产儿培养箱", ex:"Le bébé prématuré est resté en incubateur.", exZh:"这个早产儿一直待在保温箱里。", cat:"创业与初创企业"},
     {fr:"se lancer", ipa:"sə lɑ̃se", pos:"v.", en:"to launch out, start up", zh:"起步，投身", cat:"创业与初创企业"},
     {fr:"prendre des risques", ipa:"pʁɑ̃dʁ de ʁisk", pos:"loc.v.", en:"to take risks", zh:"承担风险", cat:"创业与初创企业"},
     {fr:"un modèle économique", ipa:"œ̃ mɔdɛl ekɔnɔmik", pos:"n.m.", en:"business model", zh:"商业模式", cat:"创业与初创企业"},
@@ -3118,7 +3174,7 @@
     {fr:"saluer", ipa:"salɥe", pos:"v.", en:"to greet", zh:"打招呼", cat:"礼仪与称呼"},
     {fr:"serrer la main", ipa:"seʁe la mɛ̃", pos:"loc.v.", en:"to shake hands", zh:"握手", cat:"礼仪与称呼"},
     {fr:"faire la bise", ipa:"fɛʁ la biz", pos:"loc.v.", en:"to kiss on the cheek (greeting)", zh:"贴面礼", cat:"礼仪与称呼"},
-    {fr:"poli(e)", ipa:"pɔli", pos:"adj.", en:"polite", zh:"礼貌的", en2:"polished (gem/surface)", zh2:"（宝石、表面）抛光的", cat:"礼仪与称呼"},
+    {fr:"poli(e)", ipa:"pɔli", pos:"adj.", en:"polite", zh:"礼貌的", en2:"polished (gem/surface)", zh2:"（宝石、表面）抛光的", ex:"Cette pierre a été polie avec soin.", exZh:"这块石头被精心打磨过。", cat:"礼仪与称呼"},
     {fr:"impoli(e)", ipa:"ɛ̃pɔli", pos:"adj.", en:"impolite", zh:"不礼貌的", cat:"礼仪与称呼"},
     {fr:"respecter les usages", ipa:"ʁɛspɛkte lez‿yzaʒ", pos:"loc.v.", en:"to respect customs", zh:"尊重礼俗", cat:"礼仪与称呼"},
     {fr:"une convenance sociale", ipa:"yn kɔ̃vənɑ̃s sɔsjal", pos:"n.f.", en:"social convention", zh:"社会礼俗规范", cat:"礼仪与称呼"},
@@ -3182,7 +3238,7 @@
     {fr:"un permis de construire", ipa:"œ̃ pɛʁmi də kɔ̃stʁɥiʁ", pos:"n.m.", en:"building permit", zh:"建筑许可证", cat:"建筑工种"},
     {fr:"un devis", ipa:"œ̃ dvi", pos:"n.m.", en:"quote, estimate", zh:"报价单", cat:"建筑工种"},
     {fr:"des travaux", ipa:"de tʁavo", pos:"n.m.pl.", en:"construction work, renovations", zh:"施工，装修工程", cat:"建筑工种"},
-    {fr:"isoler", ipa:"izɔle", pos:"v.", en:"to insulate", zh:"隔热，隔音", en2:"to isolate (a person, general sense)", zh2:"隔离，孤立（人，一般意义）", cat:"建筑工种"},
+    {fr:"isoler", ipa:"izɔle", pos:"v.", en:"to insulate", zh:"隔热，隔音", en2:"to isolate (a person, general sense)", zh2:"隔离，孤立（人，一般意义）", ex:"Il a fini par s'isoler de ses amis.", exZh:"他最终把自己和朋友隔绝开了。", cat:"建筑工种"},
     {fr:"l'isolation thermique", ipa:"lizɔlasjɔ̃ tɛʁmik", pos:"n.f.", en:"thermal insulation", zh:"隔热保温", cat:"建筑工种"},
 
     // 宏观经济指标 Indicateurs macroéconomiques
@@ -3195,7 +3251,7 @@
     {fr:"un indice économique", ipa:"œ̃n‿ɛ̃dis ekɔnɔmik", pos:"n.m.", en:"economic index", zh:"经济指数", cat:"宏观经济指标"},
     {fr:"le déficit public", ipa:"lə defisit pyblik", pos:"n.m.", en:"public deficit", zh:"财政赤字", cat:"宏观经济指标"},
     {fr:"la dette publique", ipa:"la dɛt pyblik", pos:"n.f.", en:"public debt", zh:"公共债务", cat:"宏观经济指标"},
-    {fr:"un excédent", ipa:"œ̃n‿ɛksedɑ̃", pos:"n.m.", en:"surplus", zh:"盈余", en2:"excess (general, e.g. 'excédent de bagage' excess baggage)", zh2:"过剩，超出（一般用法，如超重行李）", cat:"宏观经济指标"},
+    {fr:"un excédent", ipa:"œ̃n‿ɛksedɑ̃", pos:"n.m.", en:"surplus", zh:"盈余", en2:"excess (general, e.g. 'excédent de bagage' excess baggage)", zh2:"过剩，超出（一般用法，如超重行李）", ex:"Elle a dû payer un excédent de bagage à l'aéroport.", exZh:"她在机场不得不为超重行李付费。", cat:"宏观经济指标"},
     {fr:"la stagnation économique", ipa:"la staɡnasjɔ̃ ekɔnɔmik", pos:"n.f.", en:"economic stagnation", zh:"经济停滞", cat:"宏观经济指标"},
     {fr:"la stabilité économique", ipa:"la stabilite ekɔnɔmik", pos:"n.f.", en:"economic stability", zh:"经济稳定", cat:"宏观经济指标"},
     {fr:"un cycle économique", ipa:"œ̃ sikl ekɔnɔmik", pos:"n.m.", en:"economic cycle", zh:"经济周期", cat:"宏观经济指标"},
@@ -3203,9 +3259,9 @@
 
     // 司法程序 Procédure judiciaire
     {fr:"un procès", ipa:"œ̃ pʁɔsɛ", pos:"n.m.", en:"trial", zh:"审判", cat:"司法程序"},
-    {fr:"un jugement", ipa:"œ̃ ʒyʒmɑ̃", pos:"n.m.", en:"judgment, ruling", zh:"判决", en2:"judgment, discernment (general sense, e.g. 'avoir du jugement')", zh2:"判断力，见解（一般意义，如avoir du jugement）", cat:"司法程序"},
-    {fr:"plaider", ipa:"plede", pos:"v.", en:"to plead (a case)", zh:"辩护", en2:"to advocate, argue in favour of (general use)", zh2:"（泛指）为……辩护，主张", cat:"司法程序"},
-    {fr:"un(e) accusé(e)", ipa:"œ̃n‿akyze", pos:"n.", en:"the accused", zh:"被告", en2:"(in 'accusé de réception') acknowledgement of receipt", zh2:"（用于accusé de réception）收据，收到回执", cat:"司法程序"},
+    {fr:"un jugement", ipa:"œ̃ ʒyʒmɑ̃", pos:"n.m.", en:"judgment, ruling", zh:"判决", en2:"judgment, discernment (general sense, e.g. 'avoir du jugement')", zh2:"判断力，见解（一般意义，如avoir du jugement）", ex:"Fais-moi confiance, j'ai un bon jugement.", exZh:"相信我，我有很好的判断力。", cat:"司法程序"},
+    {fr:"plaider", ipa:"plede", pos:"v.", en:"to plead (a case)", zh:"辩护", en2:"to advocate, argue in favour of (general use)", zh2:"（泛指）为……辩护，主张", ex:"L'avocat a plaidé pour la clémence du juge.", exZh:"律师为宽大处理进行了辩护。", cat:"司法程序"},
+    {fr:"un(e) accusé(e)", ipa:"œ̃n‿akyze", pos:"n.", en:"the accused", zh:"被告", en2:"(in 'accusé de réception') acknowledgement of receipt", zh2:"（用于accusé de réception）收据，收到回执", ex:"Vous recevrez un accusé de réception par e-mail.", exZh:"你会通过邮件收到一封收讫确认函。", cat:"司法程序"},
     {fr:"la présomption d'innocence", ipa:"la pʁezɔ̃psjɔ̃ dinɔsɑ̃s", pos:"n.f.", en:"presumption of innocence", zh:"无罪推定", cat:"司法程序"},
     {fr:"un procureur", ipa:"œ̃ pʁɔkyʁœʁ", pos:"n.m.", en:"prosecutor", zh:"检察官", cat:"司法程序"},
     {fr:"un(e) avocat(e) de la défense", ipa:"œ̃n‿avɔka də la defɑ̃s", pos:"n.", en:"defence lawyer", zh:"辩护律师", cat:"司法程序"},
@@ -3347,7 +3403,7 @@
     {fr:"les Jeux olympiques", ipa:"le ʒø ɔlɛ̃pik", pos:"n.m.pl.", en:"the Olympic Games", zh:"奥运会", cat:"体育赛事"},
     {fr:"une médaille d'or", ipa:"yn medaj dɔʁ", pos:"n.f.", en:"gold medal", zh:"金牌", cat:"体育赛事"},
     {fr:"battre un record", ipa:"batʁ œ̃ ʁəkɔʁ", pos:"loc.v.", en:"to break a record", zh:"打破记录", cat:"体育赛事"},
-    {fr:"un classement", ipa:"œ̃ klasmɑ̃", pos:"n.m.", en:"ranking", zh:"排名", en2:"filing, classification (documents)", zh2:"归档，分类（文件）", cat:"体育赛事"},
+    {fr:"un classement", ipa:"œ̃ klasmɑ̃", pos:"n.m.", en:"ranking", zh:"排名", en2:"filing, classification (documents)", zh2:"归档，分类（文件）", ex:"Le classement des documents a pris toute la matinée.", exZh:"整理归档文件花了一整个上午。", cat:"体育赛事"},
     {fr:"un(e) finaliste", ipa:"œ̃ finalist", pos:"n.", en:"finalist", zh:"决赛选手", cat:"体育赛事"},
     {fr:"la mi-temps", ipa:"la mitɑ̃", pos:"n.f.", en:"half-time", zh:"中场休息", cat:"体育赛事"},
     {fr:"un score", ipa:"œ̃ skɔʁ", pos:"n.m.", en:"score", zh:"比分", cat:"体育赛事"},
@@ -3528,22 +3584,22 @@
     {fr:"une interface utilisateur", ipa:"yn‿ɛ̃tɛʁfas ytilizatœʁ", pos:"n.f.", en:"user interface", zh:"用户界面", cat:"编程与开发"},
 
     // 惯用表达四 Expressions idiomatiques (4)
-    {fr:"avoir la banane", ipa:"avwaʁ la banan", pos:"loc.v.", en:"to have a big smile", zh:"笑容满面（俚语）", cat:"惯用表达四"},
-    {fr:"être vert de rage", ipa:"ɛtʁ vɛʁ də ʁaʒ", pos:"loc.v.", en:"to be furious", zh:"气得脸都绿了", cat:"惯用表达四"},
-    {fr:"avoir la main verte", ipa:"avwaʁ la mɛ̃ vɛʁt", pos:"loc.v.", en:"to have a green thumb", zh:"擅长园艺", cat:"惯用表达四"},
-    {fr:"mettre de l'eau dans son vin", ipa:"mɛtʁ də lo dɑ̃ sɔ̃ vɛ̃", pos:"loc.v.", en:"to tone down, compromise", zh:"放低姿态，妥协", cat:"惯用表达四"},
-    {fr:"raconter des salades", ipa:"ʁakɔ̃te de salad", pos:"loc.v.", en:"to tell tall tales, fibs (literally 'to tell salads')", zh:"编瞎话（俚语，字面意为“讲沙拉”）", cat:"惯用表达四"},
-    {fr:"avoir un poil dans la main", ipa:"avwaʁ œ̃ pwal dɑ̃ la mɛ̃", pos:"loc.v.", en:"to be lazy (literally 'to have a hair growing in one's palm', implying one never lifts a hand to work)", zh:"懒惰（俚语，字面意为“手心长了根毛”，暗指从不动手干活）", cat:"惯用表达四"},
-    {fr:"faire la grasse matinée", ipa:"fɛʁ la ɡʁas matine", pos:"loc.v.", en:"to sleep in", zh:"睡懒觉", cat:"惯用表达四"},
-    {fr:"avoir le bras long", ipa:"avwaʁ lə bʁa lɔ̃", pos:"loc.v.", en:"to have connections/influence", zh:"有关系，有人脉", cat:"惯用表达四"},
-    {fr:"mettre la main à la pâte", ipa:"mɛtʁ la mɛ̃ a la pɑt", pos:"loc.v.", en:"to pitch in, get involved", zh:"亲自动手参与", cat:"惯用表达四"},
-    {fr:"tomber à pic", ipa:"tɔ̃be a pik", pos:"loc.v.", en:"to come at the right moment (literally 'to fall steeply/sharply', i.e. landing exactly right)", zh:"来得正是时候（字面意为“垂直落下”，引申为恰好落在对的时间点）", cat:"惯用表达四"},
-    {fr:"se mettre sur son trente et un", ipa:"sə mɛtʁ syʁ sɔ̃ tʁɑ̃t‿e œ̃", pos:"loc.v.", en:"to dress up smartly (literally 'to put on one's thirty-one', origin uncertain but implies one's very finest clothes)", zh:"盛装打扮（字面意为“穿上自己的三十一”，来源不详，泛指最好的行头）", cat:"惯用表达四"},
-    {fr:"avoir les yeux plus gros que le ventre", ipa:"avwaʁ lez‿jø ply ɡʁo kə lə vɑ̃tʁ", pos:"loc.v.", en:"to bite off more than one can chew (literally 'to have eyes bigger than one's stomach')", zh:"眼大肚小，贪多嚼不烂（字面意为“眼睛比肚子大”）", cat:"惯用表达四"},
-    {fr:"en faire tout un fromage", ipa:"ɑ̃ fɛʁ tu œ̃ fʁɔmaʒ", pos:"loc.v.", en:"to make a big deal out of something (literally 'to turn it into a whole cheese')", zh:"小题大做（字面意为“把它做成一整块奶酪”）", cat:"惯用表达四"},
-    {fr:"tirer les vers du nez à quelqu'un", ipa:"tiʁe le vɛʁ dy ne a kɛlkœ̃", pos:"loc.v.", en:"to worm information out of someone (literally 'to pull the worms out of someone's nose')", zh:"套某人的话（字面意为“从某人鼻子里拽出虫子”）", cat:"惯用表达四"},
-    {fr:"ne pas y aller par quatre chemins", ipa:"nə pa i ale paʁ katʁ ʃəmɛ̃", pos:"loc.v.", en:"to get straight to the point", zh:"直截了当", cat:"惯用表达四"},
-    {fr:"avoir du pain sur la planche", ipa:"avwaʁ dy pɛ̃ syʁ la plɑ̃ʃ", pos:"loc.v.", en:"to have a lot on one's plate", zh:"有很多事要做", cat:"惯用表达四"},
+    {fr:"avoir la banane", ipa:"avwaʁ la banan", pos:"loc.v.", en:"to have a big smile", zh:"笑容满面（俚语）", ex:"Elle a la banane depuis qu'elle a reçu de bonnes nouvelles.", exZh:"自从收到好消息后，她一直笑容满面。", cat:"惯用表达四"},
+    {fr:"être vert de rage", ipa:"ɛtʁ vɛʁ də ʁaʒ", pos:"loc.v.", en:"to be furious", zh:"气得脸都绿了", ex:"Il était vert de rage en apprenant la nouvelle.", exZh:"他听到这个消息后气得脸都绿了。", cat:"惯用表达四"},
+    {fr:"avoir la main verte", ipa:"avwaʁ la mɛ̃ vɛʁt", pos:"loc.v.", en:"to have a green thumb", zh:"擅长园艺", ex:"Ma mère a vraiment la main verte, son jardin est magnifique.", exZh:"我妈妈很擅长园艺，她的花园漂亮极了。", cat:"惯用表达四"},
+    {fr:"mettre de l'eau dans son vin", ipa:"mɛtʁ də lo dɑ̃ sɔ̃ vɛ̃", pos:"loc.v.", en:"to tone down, compromise", zh:"放低姿态，妥协", ex:"Il a fini par mettre de l'eau dans son vin pour éviter le conflit.", exZh:"他最终做出了让步以避免冲突。", cat:"惯用表达四"},
+    {fr:"raconter des salades", ipa:"ʁakɔ̃te de salad", pos:"loc.v.", en:"to tell tall tales, fibs (literally 'to tell salads')", zh:"编瞎话（俚语，字面意为“讲沙拉”）", ex:"Ne l'écoute pas, il raconte des salades.", exZh:"别听他的，他在编瞎话。", cat:"惯用表达四"},
+    {fr:"avoir un poil dans la main", ipa:"avwaʁ œ̃ pwal dɑ̃ la mɛ̃", pos:"loc.v.", en:"to be lazy (literally 'to have a hair growing in one's palm', implying one never lifts a hand to work)", zh:"懒惰（俚语，字面意为“手心长了根毛”，暗指从不动手干活）", ex:"Il ne fait rien à la maison, il a un poil dans la main.", exZh:"他在家什么都不做，太懒了。", cat:"惯用表达四"},
+    {fr:"faire la grasse matinée", ipa:"fɛʁ la ɡʁas matine", pos:"loc.v.", en:"to sleep in", zh:"睡懒觉", ex:"Le dimanche, j'aime faire la grasse matinée.", exZh:"星期天我喜欢睡懒觉。", cat:"惯用表达四"},
+    {fr:"avoir le bras long", ipa:"avwaʁ lə bʁa lɔ̃", pos:"loc.v.", en:"to have connections/influence", zh:"有关系，有人脉", ex:"Son oncle a le bras long dans cette ville.", exZh:"他叔叔在这座城市里很有人脉。", cat:"惯用表达四"},
+    {fr:"mettre la main à la pâte", ipa:"mɛtʁ la mɛ̃ a la pɑt", pos:"loc.v.", en:"to pitch in, get involved", zh:"亲自动手参与", ex:"Tout le monde doit mettre la main à la pâte pour ce projet.", exZh:"这个项目大家都得亲自动手参与。", cat:"惯用表达四"},
+    {fr:"tomber à pic", ipa:"tɔ̃be a pik", pos:"loc.v.", en:"to come at the right moment (literally 'to fall steeply/sharply', i.e. landing exactly right)", zh:"来得正是时候（字面意为“垂直落下”，引申为恰好落在对的时间点）", ex:"Ton aide tombe à pic, merci beaucoup.", exZh:"你的帮助来得正是时候，非常感谢。", cat:"惯用表达四"},
+    {fr:"se mettre sur son trente et un", ipa:"sə mɛtʁ syʁ sɔ̃ tʁɑ̃t‿e œ̃", pos:"loc.v.", en:"to dress up smartly (literally 'to put on one's thirty-one', origin uncertain but implies one's very finest clothes)", zh:"盛装打扮（字面意为“穿上自己的三十一”，来源不详，泛指最好的行头）", ex:"Elle s'est mise sur son trente et un pour le mariage.", exZh:"她为了婚礼盛装打扮了一番。", cat:"惯用表达四"},
+    {fr:"avoir les yeux plus gros que le ventre", ipa:"avwaʁ lez‿jø ply ɡʁo kə lə vɑ̃tʁ", pos:"loc.v.", en:"to bite off more than one can chew (literally 'to have eyes bigger than one's stomach')", zh:"眼大肚小，贪多嚼不烂（字面意为“眼睛比肚子大”）", ex:"Il a pris trois desserts, il avait les yeux plus gros que le ventre.", exZh:"他拿了三份甜点，真是贪多嚼不烂。", cat:"惯用表达四"},
+    {fr:"en faire tout un fromage", ipa:"ɑ̃ fɛʁ tu œ̃ fʁɔmaʒ", pos:"loc.v.", en:"to make a big deal out of something (literally 'to turn it into a whole cheese')", zh:"小题大做（字面意为“把它做成一整块奶酪”）", ex:"Ce n'est qu'une petite erreur, n'en fais pas tout un fromage.", exZh:"这只是个小错误，别小题大做。", cat:"惯用表达四"},
+    {fr:"tirer les vers du nez à quelqu'un", ipa:"tiʁe le vɛʁ dy ne a kɛlkœ̃", pos:"loc.v.", en:"to worm information out of someone (literally 'to pull the worms out of someone's nose')", zh:"套某人的话（字面意为“从某人鼻子里拽出虫子”）", ex:"Elle a réussi à lui tirer les vers du nez.", exZh:"她成功地从他嘴里套出了话。", cat:"惯用表达四"},
+    {fr:"ne pas y aller par quatre chemins", ipa:"nə pa i ale paʁ katʁ ʃəmɛ̃", pos:"loc.v.", en:"to get straight to the point", zh:"直截了当", ex:"Il n'y est pas allé par quatre chemins pour lui dire la vérité.", exZh:"他直截了当地把真相告诉了她。", cat:"惯用表达四"},
+    {fr:"avoir du pain sur la planche", ipa:"avwaʁ dy pɛ̃ syʁ la plɑ̃ʃ", pos:"loc.v.", en:"to have a lot on one's plate", zh:"有很多事要做", ex:"Avant les vacances, j'ai encore du pain sur la planche.", exZh:"放假前我还有很多事要做。", cat:"惯用表达四"},
 
     // 银行业务细节 Opérations bancaires
     {fr:"un virement bancaire", ipa:"œ̃ viʁmɑ̃ bɑ̃kɛʁ", pos:"n.m.", en:"bank transfer", zh:"银行转账", cat:"银行业务细节"},
@@ -3590,10 +3646,10 @@
     {fr:"dormir à la belle étoile", ipa:"dɔʁmiʁ a la bɛl‿etwal", pos:"loc.v.", en:"to sleep under the stars", zh:"露天而眠", cat:"露营装备"},
 
     // 调味料与香料 Épices et condiments
-    {fr:"le sel", ipa:"lə sɛl", pos:"n.m.", en:"salt", zh:"盐", en2:"(figurative, 'le sel de la vie') spice, zest of life", zh2:"（比喻）情趣，乐趣（如le sel de la vie）", cat:"调味料与香料"},
+    {fr:"le sel", ipa:"lə sɛl", pos:"n.m.", en:"salt", zh:"盐", en2:"(figurative, 'le sel de la vie') spice, zest of life", zh2:"（比喻）情趣，乐趣（如le sel de la vie）", ex:"L'humour est le sel de la vie.", exZh:"幽默是生活的调味剂。", cat:"调味料与香料"},
     {fr:"le poivre", ipa:"lə pwavʁ", pos:"n.m.", en:"pepper", zh:"胡椒", cat:"调味料与香料"},
     {fr:"le sucre", ipa:"lə sykʁ", pos:"n.m.", en:"sugar", zh:"糖", cat:"调味料与香料"},
-    {fr:"l'huile", ipa:"lɥil", pos:"n.f.", en:"oil (cooking)", zh:"食用油", en2:"(slang, 'une huile') a VIP, big shot", zh2:"（俚语une huile）大人物，要人", cat:"调味料与香料"},
+    {fr:"l'huile", ipa:"lɥil", pos:"n.f.", en:"oil (cooking)", zh:"食用油", en2:"(slang, 'une huile') a VIP, big shot", zh2:"（俚语une huile）大人物，要人", ex:"C'est une huile dans cette entreprise.", exZh:"他是这家公司里的大人物。", cat:"调味料与香料"},
     {fr:"le vinaigre", ipa:"lə vinɛɡʁ", pos:"n.m.", en:"vinegar", zh:"醋", cat:"调味料与香料"},
     {fr:"la moutarde", ipa:"la mutaʁd", pos:"n.f.", en:"mustard", zh:"芥末", cat:"调味料与香料"},
     {fr:"l'ail", ipa:"laj", pos:"n.m.", en:"garlic", zh:"大蒜", cat:"调味料与香料"},
@@ -3632,7 +3688,7 @@
     {fr:"faire preuve de diplomatie", ipa:"fɛʁ pʁœv də diplɔmasi", pos:"loc.v.", en:"to show diplomacy", zh:"展现外交手腕", cat:"冲突解决"},
 
     // 考试类型 Types d'examens
-    {fr:"le bac", ipa:"lə bak", pos:"n.m.", en:"the baccalauréat (French high school exam)", zh:"会考（法国高中毕业考试）", en2:"a bin, container (e.g. 'un bac à légumes')", zh2:"箱，槽（如蔬菜保鲜盒）", cat:"考试类型"},
+    {fr:"le bac", ipa:"lə bak", pos:"n.m.", en:"the baccalauréat (French high school exam)", zh:"会考（法国高中毕业考试）", en2:"a bin, container (e.g. 'un bac à légumes')", zh2:"箱，槽（如蔬菜保鲜盒）", ex:"Elle a mis les légumes dans un bac en plastique.", exZh:"她把蔬菜放进了一个塑料箱里。", cat:"考试类型"},
     {fr:"un partiel", ipa:"œ̃ paʁsjɛl", pos:"n.m.", en:"midterm exam", zh:"期中考试", cat:"考试类型"},
     {fr:"une épreuve", ipa:"yn‿epʁœv", pos:"n.f.", en:"an exam paper, test", zh:"考试科目，测验", cat:"考试类型"},
     {fr:"réviser", ipa:"ʁevize", pos:"v.", en:"to revise, study (for an exam)", zh:"复习", cat:"考试类型"},
@@ -3646,7 +3702,7 @@
     {fr:"un écrit", ipa:"œ̃n‿ekʁi", pos:"n.m.", en:"written exam", zh:"笔试", cat:"考试类型"},
 
     // 股票市场 Marché boursier
-    {fr:"une action", ipa:"yn‿aksjɔ̃", pos:"n.f.", en:"a share, stock", zh:"股票", en2:"an action, a deed (general sense)", zh2:"行动，举动（一般意义）", cat:"股票市场"},
+    {fr:"une action", ipa:"yn‿aksjɔ̃", pos:"n.f.", en:"a share, stock", zh:"股票", en2:"an action, a deed (general sense)", zh2:"行动，举动（一般意义）", ex:"Son action a sauvé plusieurs vies.", exZh:"他的这一举动挽救了好几条生命。", cat:"股票市场"},
     {fr:"une obligation", ipa:"yn‿ɔbliɡasjɔ̃", pos:"n.f.", en:"a bond", zh:"债券", cat:"股票市场"},
     {fr:"un portefeuille d'actions", ipa:"œ̃ pɔʁtəfœj daksjɔ̃", pos:"n.m.", en:"stock portfolio", zh:"股票投资组合", cat:"股票市场"},
     {fr:"le cours d'une action", ipa:"lə kuʁ dyn‿aksjɔ̃", pos:"n.m.", en:"share price", zh:"股价", cat:"股票市场"},
@@ -3660,7 +3716,7 @@
     {fr:"un fonds d'investissement", ipa:"œ̃ fɔ̃ dɛ̃vɛstismɑ̃", pos:"n.m.", en:"investment fund", zh:"投资基金", cat:"股票市场"},
 
     // 贵金属与宝石 Pierres et métaux précieux
-    {fr:"l'or", ipa:"lɔʁ", pos:"n.m.", en:"gold", zh:"黄金", en2:"(figurative, 'en or') golden, wonderful", zh2:"（比喻）极好的，黄金般的（如en or）", cat:"贵金属与宝石"},
+    {fr:"l'or", ipa:"lɔʁ", pos:"n.m.", en:"gold", zh:"黄金", en2:"(figurative, 'en or') golden, wonderful", zh2:"（比喻）极好的，黄金般的（如en or）", ex:"Ce voyage était une occasion en or.", exZh:"这次旅行是个绝佳的机会。", cat:"贵金属与宝石"},
     {fr:"un diamant", ipa:"œ̃ djamɑ̃", pos:"n.m.", en:"diamond", zh:"钻石", cat:"贵金属与宝石"},
     {fr:"une perle", ipa:"yn pɛʁl", pos:"n.f.", en:"pearl", zh:"珍珠", cat:"贵金属与宝石"},
     {fr:"un rubis", ipa:"œ̃ ʁybi", pos:"n.m.", en:"ruby", zh:"红宝石", cat:"贵金属与宝石"},
@@ -3695,7 +3751,7 @@
     {fr:"se déconnecter", ipa:"sə dekɔnɛkte", pos:"v.", en:"to log out", zh:"登出", cat:"网络平台术语"},
     {fr:"les conditions d'utilisation", ipa:"le kɔ̃disjɔ̃ dytilizasjɔ̃", pos:"n.f.pl.", en:"terms of use", zh:"使用条款", cat:"网络平台术语"},
     {fr:"un algorithme de recommandation", ipa:"œ̃n‿alɡɔʁitm də ʁəkɔmɑ̃dasjɔ̃", pos:"n.m.", en:"recommendation algorithm", zh:"推荐算法", cat:"网络平台术语"},
-    {fr:"un flux", ipa:"œ̃ fly", pos:"n.m.", en:"a feed (content stream)", zh:"信息流", en2:"flow (general, e.g. traffic, economic)", zh2:"流量，流动（一般意义，如车流、经济）", cat:"网络平台术语"},
+    {fr:"un flux", ipa:"œ̃ fly", pos:"n.m.", en:"a feed (content stream)", zh:"信息流", en2:"flow (general, e.g. traffic, economic)", zh2:"流量，流动（一般意义，如车流、经济）", ex:"Le flux de touristes augmente chaque été.", exZh:"每年夏天游客流量都会增加。", cat:"网络平台术语"},
     {fr:"un espace membre", ipa:"œ̃n‿ɛspas mɑ̃bʁ", pos:"n.m.", en:"member area", zh:"会员专区", cat:"网络平台术语"},
     {fr:"une interface conviviale", ipa:"yn‿ɛ̃tɛʁfas kɔ̃vivjal", pos:"n.f.", en:"user-friendly interface", zh:"友好的用户界面", cat:"网络平台术语"},
     {fr:"un identifiant", ipa:"œ̃n‿idɑ̃tifjɑ̃", pos:"n.m.", en:"username, login ID", zh:"登录账号", cat:"网络平台术语"},
@@ -3710,7 +3766,7 @@
     {fr:"l'altitude", ipa:"laltityd", pos:"n.f.", en:"altitude", zh:"海拔", cat:"极地与高山环境"},
     {fr:"le mal des montagnes", ipa:"lə mal de mɔ̃taɲ", pos:"n.m.", en:"altitude sickness", zh:"高原反应", cat:"极地与高山环境"},
     {fr:"un iceberg", ipa:"œ̃n‿ajsbɛʁɡ", pos:"n.m.", en:"iceberg", zh:"冰山", cat:"极地与高山环境"},
-    {fr:"une avalanche", ipa:"yn‿avalɑ̃ʃ", pos:"n.f.", en:"avalanche", zh:"雪崩", en2:"(figurative) a flood, barrage of something", zh2:"（比喻）大量，一连串（如批评）", cat:"极地与高山环境"},
+    {fr:"une avalanche", ipa:"yn‿avalɑ̃ʃ", pos:"n.f.", en:"avalanche", zh:"雪崩", en2:"(figurative) a flood, barrage of something", zh2:"（比喻）大量，一连串（如批评）", ex:"Il a reçu une avalanche de critiques après son discours.", exZh:"他的演讲之后招来了大量的批评。", cat:"极地与高山环境"},
     {fr:"le froid extrême", ipa:"lə fʁwa ɛkstʁɛm", pos:"n.m.", en:"extreme cold", zh:"极寒", cat:"极地与高山环境"},
     {fr:"une expédition polaire", ipa:"yn‿ɛkspedisjɔ̃ pɔlɛʁ", pos:"n.f.", en:"polar expedition", zh:"极地探险", cat:"极地与高山环境"},
     {fr:"s'acclimater", ipa:"saklimate", pos:"v.", en:"to acclimatize", zh:"适应环境（气候）", cat:"极地与高山环境"},
@@ -3759,31 +3815,92 @@
   // Mastered words are keyed by the French headword itself (not array position),
   // so re-ordering or inserting vocabulary in future updates can never shift or
   // lose a learner's progress the way a numeric-index key could.
-  var STORAGE_KEY = "tef-vocab-mastered-fr-v1";
-  var LEGACY_STORAGE_KEY = "tef-vocab-mastered-v2"; // old id-keyed format, migrated once
-  var mastered = {}; // { [fr]: true }
+  // Spaced repetition: each word gets a "box" (0-5, how well it's known) and a
+  // "due" date (when it should be reviewed next). Grading a card after flipping
+  // it moves the box up/down and reschedules the due date accordingly.
+  var SRS_KEY = "tef-vocab-srs-v1";
+  var LEGACY_FR_KEY = "tef-vocab-mastered-fr-v1";   // old binary fr-keyed store, migrated once
+  var LEGACY_ID_KEY = "tef-vocab-mastered-v2";       // even older id-keyed store, migrated once
+  var BOX_INTERVALS = [0, 1, 3, 7, 16, 35];          // days until next review, by box
+  var MASTERED_BOX = 4;                              // box at/above this counts as "mastered"
+  var srs = {}; // { [fr]: { box: 0-5, due: "YYYY-MM-DD" } }
 
-  (function loadMastered() {
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+  function addDaysStr(dateStr, days) {
+    var d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + days);
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+
+  (function loadSrs() {
     try {
-      var raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        mastered = JSON.parse(raw) || {};
+      var raw = window.localStorage.getItem(SRS_KEY);
+      if (raw) { srs = JSON.parse(raw) || {}; return; }
+    } catch (e) { srs = {}; }
+    // One-time migration from older binary "mastered" stores, giving migrated
+    // words a head start (treated as already fairly well known) rather than
+    // losing that signal entirely.
+    try {
+      var legacyFrRaw = window.localStorage.getItem(LEGACY_FR_KEY);
+      if (legacyFrRaw) {
+        var legacyFr = JSON.parse(legacyFrRaw) || {};
+        Object.keys(legacyFr).forEach(function (fr) {
+          if (legacyFr[fr]) srs[fr] = { box: MASTERED_BOX, due: addDaysStr(todayStr(), BOX_INTERVALS[MASTERED_BOX]) };
+        });
+        saveSrs();
         return;
       }
-    } catch (e) { mastered = {}; }
-    // One-time migration from the old id-keyed store, if present.
+    } catch (e) {}
     try {
-      var legacyRaw = window.localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (legacyRaw) {
-        var legacy = JSON.parse(legacyRaw) || {};
-        VOCAB.forEach(function (w) { if (legacy[w.id]) mastered[w.fr] = true; });
-        saveMastered();
+      var legacyIdRaw = window.localStorage.getItem(LEGACY_ID_KEY);
+      if (legacyIdRaw) {
+        var legacyId = JSON.parse(legacyIdRaw) || {};
+        VOCAB.forEach(function (w) {
+          if (legacyId[w.id]) srs[w.fr] = { box: MASTERED_BOX, due: addDaysStr(todayStr(), BOX_INTERVALS[MASTERED_BOX]) };
+        });
+        saveSrs();
       }
     } catch (e) {}
   })();
 
-  function saveMastered() {
-    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(mastered)); } catch (e) {}
+  function saveSrs() {
+    try { window.localStorage.setItem(SRS_KEY, JSON.stringify(srs)); } catch (e) {}
+  }
+  function isDue(fr) {
+    var rec = srs[fr];
+    return !rec || rec.due <= todayStr();
+  }
+  function isMastered(fr) {
+    var rec = srs[fr];
+    return !!rec && rec.box >= MASTERED_BOX;
+  }
+  // grade: "again" (forgot it) | "hard" (shaky) | "good" (knew it)
+  function gradeWord(fr, grade) {
+    var rec = srs[fr] || { box: 0, due: todayStr() };
+    if (grade === "again") {
+      rec.box = 0;
+      rec.due = todayStr();
+    } else if (grade === "hard") {
+      var half = Math.max(1, Math.floor(BOX_INTERVALS[rec.box] / 2));
+      rec.due = addDaysStr(todayStr(), half);
+    } else {
+      rec.box = Math.min(BOX_INTERVALS.length - 1, rec.box + 1);
+      rec.due = addDaysStr(todayStr(), BOX_INTERVALS[rec.box]);
+    }
+    srs[fr] = rec;
+    saveSrs();
+  }
+  // quick manual override from the list view's star toggle
+  function setMasteredQuick(fr, on) {
+    var top = BOX_INTERVALS.length - 1;
+    srs[fr] = on
+      ? { box: top, due: addDaysStr(todayStr(), BOX_INTERVALS[top]) }
+      : { box: 0, due: todayStr() };
+    saveSrs();
   }
 
   var categories = [];
@@ -3814,12 +3931,14 @@
   var subCatLabel = document.getElementById("subCatLabel");
   var catBar = document.getElementById("catBar");
   var tabStudyBtn = document.getElementById("tabStudyBtn");
+  var tabQuizBtn = document.getElementById("tabQuizBtn");
   var tabListBtn = document.getElementById("tabListBtn");
   var studyPanel = document.getElementById("studyPanel");
+  var quizPanel = document.getElementById("quizPanel");
   var listPanel = document.getElementById("listPanel");
 
   var shuffleCb = document.getElementById("shuffleCb");
-  var onlyUnmasteredStudy = document.getElementById("onlyUnmasteredStudy");
+  var onlyDueStudy = document.getElementById("onlyDueStudy");
   var onlyUnmasteredList = document.getElementById("onlyUnmasteredList");
   var reshuffleBtn = document.getElementById("reshuffleBtn");
   var studyEmpty = document.getElementById("studyEmpty");
@@ -3829,10 +3948,21 @@
   var studyCardInner = document.getElementById("studyCardInner");
   var studyFront = document.getElementById("studyFront");
   var studyBack = document.getElementById("studyBack");
-  var studyStar = document.getElementById("studyStar");
+  var deckHint = document.getElementById("deckHint");
   var prevBtn = document.getElementById("prevBtn");
   var nextBtn = document.getElementById("nextBtn");
-  var masterBtn = document.getElementById("masterBtn");
+  var gradeRow = document.getElementById("gradeRow");
+  var gradeAgainBtn = document.getElementById("gradeAgainBtn");
+  var gradeHardBtn = document.getElementById("gradeHardBtn");
+  var gradeGoodBtn = document.getElementById("gradeGoodBtn");
+
+  var quizScoreEl = document.getElementById("quizScore");
+  var quizRestartBtn = document.getElementById("quizRestartBtn");
+  var quizEmpty = document.getElementById("quizEmpty");
+  var quizArea = document.getElementById("quizArea");
+  var quizQuestionEl = document.getElementById("quizQuestion");
+  var quizOptionsEl = document.getElementById("quizOptions");
+  var quizNextBtn = document.getElementById("quizNextBtn");
 
   var searchInput = document.getElementById("searchInput");
   var listEmpty = document.getElementById("listEmpty");
@@ -3841,6 +3971,7 @@
 
   var masteredCountEl = document.getElementById("masteredCount");
   var totalCountEl = document.getElementById("totalCount");
+  var dueCountEl = document.getElementById("dueCount");
   var progressBar = document.getElementById("progressBar");
   var resetBtn = document.getElementById("resetBtn");
 
@@ -3965,12 +4096,12 @@
 
   function getFiltered(forStudy) {
     var q = state.query.trim().toLowerCase();
-    var onlyU = forStudy ? onlyUnmasteredStudy.checked : onlyUnmasteredList.checked;
     return VOCAB.filter(function (w) {
       if (state.level !== "全部" && w.level !== state.level) return false;
       if (state.major !== "全部" && w.major !== state.major) return false;
       if (state.cat !== "全部" && w.cat !== state.cat) return false;
-      if (onlyU && mastered[w.fr]) return false;
+      if (forStudy && onlyDueStudy.checked && !isDue(w.fr)) return false;
+      if (!forStudy && onlyUnmasteredList.checked && isMastered(w.fr)) return false;
       if (!forStudy && q) {
         if (w.fr.toLowerCase().indexOf(q) !== -1) return true;
         if (w.ipa && w.ipa.indexOf(q) !== -1) return true;
@@ -3983,17 +4114,15 @@
   }
 
   function updateStats() {
-    var total = 0;
-    VOCAB.forEach(function (w) { if (mastered[w.fr]) total++; });
+    var total = 0, due = 0;
+    VOCAB.forEach(function (w) {
+      if (isMastered(w.fr)) total++;
+      if (isDue(w.fr)) due++;
+    });
     masteredCountEl.textContent = total;
     totalCountEl.textContent = VOCAB.length;
+    dueCountEl.textContent = due;
     progressBar.style.width = (VOCAB.length ? (total / VOCAB.length * 100) : 0) + "%";
-  }
-
-  function toggleMastered(fr) {
-    if (mastered[fr]) delete mastered[fr]; else mastered[fr] = true;
-    saveMastered();
-    updateStats();
   }
 
   // ---------- study deck ----------
@@ -4009,6 +4138,14 @@
     renderStudyCard();
   }
 
+  function srsCaption(fr) {
+    var rec = srs[fr];
+    if (!rec) return "尚未学习";
+    if (rec.due <= todayStr()) return "🔁 该复习了";
+    var days = Math.max(1, Math.round((new Date(rec.due + "T00:00:00") - new Date(todayStr() + "T00:00:00")) / 86400000));
+    return "第 " + rec.box + " 关 · " + days + " 天后复习";
+  }
+
   function renderStudyCard() {
     var hasWords = deck.length > 0;
     studyEmpty.hidden = hasWords;
@@ -4017,6 +4154,8 @@
     if (!hasWords) return;
 
     studyCard.classList.remove("flipped");
+    gradeRow.hidden = true;
+    deckHint.hidden = false;
     var w = deck[deckIndex];
     var tn = tint(w);
     deckCount.textContent = "第 " + (deckIndex + 1) + " / " + deck.length + " 个";
@@ -4027,21 +4166,19 @@
       '<span class="fr-line"><span class="fr-word">' + w.fr + '</span>' + speakBtn + '</span>' +
       '<span class="ipa-line">[' + w.ipa + ']</span>' +
       '<span class="pos-line">' + w.pos + '</span>' +
+      '<span class="srs-info">' + srsCaption(w.fr) + '</span>' +
       '<span class="taphint">点击卡片查看释义' + (TTS_OK ? " · 点 🔊 听发音" : "") + '</span>';
 
     var senses = sensesOf(w);
-    studyBack.className = "sface back tint-" + tn + (senses.length > 1 ? " multi" : "");
-    studyBack.innerHTML = senses.map(function (s, i) {
+    studyBack.className = "sface back tint-" + tn + (senses.length > 1 || w.ex ? " multi" : "");
+    var sensesHtml = senses.map(function (s, i) {
       var num = senses.length > 1 ? '<span class="sense-num">' + (i + 1) + '</span>' : "";
       return '<div class="sense">' + num +
         '<span class="en-word">' + s.en + '</span>' +
         '<span class="zh-word">' + s.zh + '</span></div>';
     }).join("");
-
-    var on = !!mastered[w.fr];
-    studyStar.setAttribute("aria-pressed", String(on));
-    studyStar.textContent = on ? "★" : "☆";
-    masterBtn.textContent = on ? "★ 已掌握" : "★ 标记已掌握";
+    var exampleHtml = w.ex ? '<div class="example"><span class="ex-fr">' + w.ex + '</span><span class="ex-zh">' + w.exZh + '</span></div>' : "";
+    studyBack.innerHTML = sensesHtml + exampleHtml;
   }
 
   function goTo(delta) {
@@ -4050,19 +4187,32 @@
     renderStudyCard();
   }
 
-  function flipStudy() { studyCard.classList.toggle("flipped"); }
+  function flipStudy() {
+    var flipped = studyCard.classList.toggle("flipped");
+    gradeRow.hidden = !flipped;
+    deckHint.hidden = flipped;
+  }
 
-  function markCurrent() {
+  function gradeCurrent(grade) {
     if (deck.length === 0) return;
     var w = deck[deckIndex];
-    toggleMastered(w.fr);
-    if (onlyUnmasteredStudy.checked && mastered[w.fr]) {
-      // remove from deck, keep place
+    gradeWord(w.fr, grade);
+    updateStats();
+    if (grade === "again") {
+      // resurface this word a few cards later in the same session instead of immediately
+      deck.splice(deckIndex, 1);
+      var reinsertAt = Math.min(deck.length, deckIndex + 3);
+      deck.splice(reinsertAt, 0, w);
+      if (deckIndex >= deck.length) deckIndex = 0;
+      renderStudyCard();
+      return;
+    }
+    if (onlyDueStudy.checked && !isDue(w.fr)) {
       deck.splice(deckIndex, 1);
       if (deckIndex >= deck.length) deckIndex = 0;
       renderStudyCard();
     } else {
-      renderStudyCard();
+      goTo(1);
     }
   }
 
@@ -4089,11 +4239,11 @@
     });
   })();
 
-  studyStar.addEventListener("click", function (e) { e.stopPropagation(); markCurrent(); });
-  studyStar.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
   prevBtn.addEventListener("click", function () { goTo(-1); });
   nextBtn.addEventListener("click", function () { goTo(1); });
-  masterBtn.addEventListener("click", markCurrent);
+  gradeAgainBtn.addEventListener("click", function () { gradeCurrent("again"); });
+  gradeHardBtn.addEventListener("click", function () { gradeCurrent("hard"); });
+  gradeGoodBtn.addEventListener("click", function () { gradeCurrent("good"); });
   reshuffleBtn.addEventListener("click", function () { rebuildDeck(); });
 
   document.addEventListener("keydown", function (e) {
@@ -4102,10 +4252,15 @@
     if (e.key === "ArrowLeft") goTo(-1);
     else if (e.key === "ArrowRight") goTo(1);
     else if (e.key === " " || e.key === "Enter") { e.preventDefault(); flipStudy(); }
+    else if (studyCard.classList.contains("flipped")) {
+      if (e.key === "1") gradeCurrent("again");
+      else if (e.key === "2") gradeCurrent("hard");
+      else if (e.key === "3") gradeCurrent("good");
+    }
   });
 
   shuffleCb.addEventListener("change", function () { state.shuffle = shuffleCb.checked; rebuildDeck(); });
-  onlyUnmasteredStudy.addEventListener("change", function () { rebuildDeck(); });
+  onlyDueStudy.addEventListener("change", function () { rebuildDeck(); });
 
   // ---------- list/browse ----------
   function renderList() {
@@ -4121,12 +4276,13 @@
       var star = document.createElement("button");
       star.type = "button";
       star.className = "mini-star";
-      star.setAttribute("aria-pressed", String(!!mastered[w.fr]));
+      star.setAttribute("aria-pressed", String(isMastered(w.fr)));
       star.setAttribute("aria-label", "标记 " + w.fr + " 为已掌握");
-      star.textContent = mastered[w.fr] ? "★" : "☆";
+      star.textContent = isMastered(w.fr) ? "★" : "☆";
       star.addEventListener("click", function () {
-        toggleMastered(w.fr);
-        var on = !!mastered[w.fr];
+        setMasteredQuick(w.fr, !isMastered(w.fr));
+        updateStats();
+        var on = isMastered(w.fr);
         star.setAttribute("aria-pressed", String(on));
         star.textContent = on ? "★" : "☆";
         if (onlyUnmasteredList.checked) renderList();
@@ -4154,6 +4310,12 @@
         line.textContent = multi ? (i + 1) + ". " + s.zh : s.zh;
         zhTd.appendChild(line);
       });
+      if (w.ex) {
+        var exLine = document.createElement("div");
+        exLine.className = "ex-cell";
+        exLine.innerHTML = "<em>" + w.ex + "</em><br>" + w.exZh;
+        zhTd.appendChild(exLine);
+      }
 
       var catTd = document.createElement("td");
       catTd.innerHTML = '<span class="tag ' + tn + '">' + w.cat + "</span>";
@@ -4174,11 +4336,15 @@
   function setTab(tab) {
     state.tab = tab;
     tabStudyBtn.setAttribute("aria-selected", String(tab === "study"));
+    tabQuizBtn.setAttribute("aria-selected", String(tab === "quiz"));
     tabListBtn.setAttribute("aria-selected", String(tab === "list"));
     studyPanel.hidden = tab !== "study";
+    quizPanel.hidden = tab !== "quiz";
     listPanel.hidden = tab !== "list";
+    if (tab === "quiz" && quizQueue.length === 0) buildQuizRound();
   }
   tabStudyBtn.addEventListener("click", function () { setTab("study"); });
+  tabQuizBtn.addEventListener("click", function () { setTab("quiz"); });
   tabListBtn.addEventListener("click", function () { setTab("list"); });
 
   function onFiltersChanged() {
@@ -4187,15 +4353,17 @@
     buildCatBar();
     rebuildDeck();
     renderList();
+    buildQuizRound();
   }
 
   resetBtn.addEventListener("click", function () {
-    if (!window.confirm("确定要清空所有「已掌握」标记吗？此操作不可撤销，建议先点「导出进度」备份一份。")) return;
-    mastered = {};
-    saveMastered();
+    if (!window.confirm("确定要清空所有学习记录（已掌握状态和复习进度）吗？此操作不可撤销，建议先点「导出进度」备份一份。")) return;
+    srs = {};
+    saveSrs();
     updateStats();
     renderStudyCard();
     renderList();
+    buildQuizRound();
   });
 
   // ---------- export / import progress (manual backup, independent of browser storage) ----------
@@ -4204,12 +4372,11 @@
   var importMsg = document.getElementById("importMsg");
 
   exportBtn.addEventListener("click", function () {
-    var words = Object.keys(mastered).filter(function (fr) { return mastered[fr]; });
     var payload = {
-      app: "tef-vocab-mastered",
+      app: "tef-vocab-srs",
       exportedAt: new Date().toISOString(),
-      count: words.length,
-      words: words
+      count: Object.keys(srs).length,
+      srs: srs
     };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     var url = URL.createObjectURL(blob);
@@ -4221,7 +4388,7 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    importMsg.textContent = "已导出 " + words.length + " 个已掌握的词。";
+    importMsg.textContent = "已导出 " + payload.count + " 个词的学习记录。";
   });
 
   importFile.addEventListener("change", function () {
@@ -4231,16 +4398,30 @@
     reader.onload = function () {
       try {
         var data = JSON.parse(String(reader.result));
-        var words = Array.isArray(data.words) ? data.words : [];
         var added = 0;
-        words.forEach(function (fr) {
-          if (typeof fr === "string" && !mastered[fr]) { mastered[fr] = true; added++; }
-        });
-        saveMastered();
+        if (data.srs && typeof data.srs === "object") {
+          Object.keys(data.srs).forEach(function (fr) {
+            var rec = data.srs[fr];
+            if (rec && typeof rec.box === "number" && typeof rec.due === "string") {
+              srs[fr] = { box: rec.box, due: rec.due };
+              added++;
+            }
+          });
+        } else if (Array.isArray(data.words)) {
+          // backward compatibility with the older binary "mastered" export format
+          data.words.forEach(function (fr) {
+            if (typeof fr === "string") {
+              srs[fr] = { box: MASTERED_BOX, due: addDaysStr(todayStr(), BOX_INTERVALS[MASTERED_BOX]) };
+              added++;
+            }
+          });
+        }
+        saveSrs();
         updateStats();
         renderStudyCard();
         renderList();
-        importMsg.textContent = "已导入，新增 " + added + " 个已掌握的词（文件中共 " + words.length + " 个）。";
+        buildQuizRound();
+        importMsg.textContent = "已导入 " + added + " 个词的学习记录。";
       } catch (e) {
         importMsg.textContent = "导入失败：文件格式不正确。";
       }
@@ -4253,6 +4434,106 @@
     reader.readAsText(file);
   });
 
+  // ---------- quiz mode ----------
+  var quizQueue = [];
+  var quizIndex = 0;
+  var quizScore = { correct: 0, total: 0 };
+  var QUIZ_ROUND_SIZE = 10;
+
+  function getQuizPool() {
+    return VOCAB.filter(function (w) {
+      if (state.level !== "全部" && w.level !== state.level) return false;
+      if (state.major !== "全部" && w.major !== state.major) return false;
+      if (state.cat !== "全部" && w.cat !== state.cat) return false;
+      return true;
+    });
+  }
+
+  function buildQuizRound() {
+    var pool = getQuizPool();
+    quizScore = { correct: 0, total: 0 };
+    if (pool.length < 4) { quizQueue = []; quizIndex = 0; renderQuizQuestion(); return; }
+    var due = pool.filter(function (w) { return isDue(w.fr); });
+    var rest = pool.filter(function (w) { return !isDue(w.fr); });
+    shuffleArr(due);
+    shuffleArr(rest);
+    quizQueue = due.concat(rest).slice(0, Math.min(QUIZ_ROUND_SIZE, pool.length));
+    quizIndex = 0;
+    renderQuizQuestion();
+  }
+
+  function renderQuizQuestion() {
+    var pool = getQuizPool();
+    var hasEnough = pool.length >= 4;
+    quizEmpty.hidden = hasEnough;
+    quizArea.hidden = !hasEnough;
+    quizScoreEl.textContent = "本轮：" + quizScore.correct + " / " + quizScore.total;
+    if (!hasEnough) return;
+
+    if (quizIndex >= quizQueue.length) {
+      quizQuestionEl.innerHTML =
+        '<span class="fr-word">本轮完成！</span>' +
+        '<span class="srs-info" style="display:block;margin-top:6px;">答对 ' + quizScore.correct + ' / ' + quizScore.total + ' 题</span>';
+      quizOptionsEl.innerHTML = "";
+      quizNextBtn.hidden = true;
+      return;
+    }
+
+    var w = quizQueue[quizIndex];
+    var tn = tint(w);
+    var speakBtn = TTS_OK ? '<button type="button" class="speak-btn" data-fr="' + w.fr + '" aria-label="朗读">🔊</button>' : "";
+    quizQuestionEl.innerHTML =
+      '<span class="cat-line"><span class="lvl-tag ' + tn + '">' + w.level + " · " + w.cat + '</span></span>' +
+      '<span class="fr-line"><span class="fr-word">' + w.fr + '</span>' + speakBtn + '</span>' +
+      '<span class="ipa-line">[' + w.ipa + ']</span>';
+
+    var correctZh = sensesOf(w)[0].zh;
+    var distractPool = pool.filter(function (o) { return o.fr !== w.fr; });
+    shuffleArr(distractPool);
+    var options = [correctZh];
+    for (var i = 0; i < distractPool.length && options.length < 4; i++) {
+      var cand = sensesOf(distractPool[i])[0].zh;
+      if (options.indexOf(cand) === -1) options.push(cand);
+    }
+    shuffleArr(options);
+
+    quizNextBtn.hidden = true;
+    quizOptionsEl.innerHTML = "";
+    options.forEach(function (opt) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quiz-option";
+      btn.textContent = opt;
+      btn.addEventListener("click", function () { answerQuiz(w, opt, correctZh, btn); });
+      quizOptionsEl.appendChild(btn);
+    });
+  }
+
+  function answerQuiz(w, chosen, correctZh, chosenBtn) {
+    var buttons = quizOptionsEl.querySelectorAll(".quiz-option");
+    var isCorrect = chosen === correctZh;
+    quizScore.total++;
+    if (isCorrect) quizScore.correct++;
+    gradeWord(w.fr, isCorrect ? "good" : "again");
+    updateStats();
+    buttons.forEach(function (b) {
+      b.disabled = true;
+      if (b.textContent === correctZh) b.classList.add("correct");
+      else if (b === chosenBtn) b.classList.add("wrong");
+    });
+    quizScoreEl.textContent = "本轮：" + quizScore.correct + " / " + quizScore.total;
+    if (w.ex) {
+      var exDiv = document.createElement("div");
+      exDiv.className = "example";
+      exDiv.innerHTML = '<span class="ex-fr">' + w.ex + '</span><span class="ex-zh">' + w.exZh + '</span>';
+      quizOptionsEl.appendChild(exDiv);
+    }
+    quizNextBtn.hidden = false;
+  }
+
+  quizNextBtn.addEventListener("click", function () { quizIndex++; renderQuizQuestion(); });
+  quizRestartBtn.addEventListener("click", function () { buildQuizRound(); });
+
   // ---------- init ----------
   buildLevelBar();
   buildMajorBar();
@@ -4260,6 +4541,7 @@
   updateStats();
   rebuildDeck();
   renderList();
+  buildQuizRound();
   setTab("study");
 })();
 </script>
