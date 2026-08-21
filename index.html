@@ -110,6 +110,9 @@
   .pillrow.level button[data-lvl="基础"][aria-pressed="true"] { background: var(--pink-ink); border-color: var(--pink-ink); color: #fff; }
   .pillrow.level button[data-lvl="进阶"][aria-pressed="true"] { background: var(--orange-ink); border-color: var(--orange-ink); color: #fff; }
   .pillrow button .n { opacity: .6; margin-left: 3px; font-variant-numeric: tabular-nums; }
+  .pillrow.scheme { margin-bottom: 4px; }
+  .pillrow.scheme button { font-weight: 700; border-style: dashed; }
+  .pillrow.scheme button[aria-pressed="true"] { border-style: solid; }
   .filter-label { font-size: .68rem; color: var(--ink-muted); letter-spacing: .04em; margin: 10px 0 6px; text-transform: uppercase; }
 
   .opts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 12px 0 4px; }
@@ -292,7 +295,8 @@
   </div>
 
   <div class="pillrow level" id="levelBar"></div>
-  <div class="filter-label">主题大类</div>
+  <div class="pillrow scheme" id="schemeBar"></div>
+  <div class="filter-label" id="majorLabel">主题大类</div>
   <div class="pillrow" id="majorBar"></div>
   <div class="filter-label" id="subCatLabel" hidden>子分类</div>
   <div class="pillrow" id="catBar" hidden></div>
@@ -429,8 +433,40 @@
     MAJOR_GROUPS[m].forEach(function (c) { SUBCAT_TO_MAJOR[c] = m; });
   });
 
+  // Part-of-speech classification: a second, parallel way to browse the same
+  // vocabulary (major POS group -> raw pos tag), mirroring MAJOR_ORDER/
+  // MAJOR_GROUPS/SUBCAT_TO_MAJOR above but keyed off each word's `pos` field
+  // instead of its `cat` field.
+  var POS_MAJOR_ORDER = ["名词", "动词", "形容词", "副词", "介词", "连词", "代词", "其他/兼类"];
+  var POS_MAJOR_GROUPS = {
+    "名词": ["n.m.", "n.f.", "n.", "n.m.pl.", "n.f.pl."],
+    "动词": ["v.", "loc.v."],
+    "形容词": ["adj.", "loc.adj."],
+    "副词": ["adv.", "loc.adv."],
+    "介词": ["prép.", "loc.prép."],
+    "连词": ["conj.", "loc.conj."],
+    "代词": ["pron.", "loc.pron."],
+    "其他/兼类": ["loc.", "loc.gramm.", "adj./n.", "adj./n.f.", "n./adj."]
+  };
+  var POS_LABELS = {
+    "n.m.": "阳性名词 n.m.", "n.f.": "阴性名词 n.f.", "n.": "通性名词 n.",
+    "n.m.pl.": "阳性复数 n.m.pl.", "n.f.pl.": "阴性复数 n.f.pl.",
+    "v.": "动词 v.", "loc.v.": "动词短语 loc.v.",
+    "adj.": "形容词 adj.", "loc.adj.": "形容词短语 loc.adj.",
+    "adv.": "副词 adv.", "loc.adv.": "副词短语 loc.adv.",
+    "prép.": "介词 prép.", "loc.prép.": "介词短语 loc.prép.",
+    "conj.": "连词 conj.", "loc.conj.": "连词短语 loc.conj.",
+    "pron.": "代词 pron.", "loc.pron.": "代词短语 loc.pron.",
+    "loc.": "固定短语 loc.", "loc.gramm.": "语法短语 loc.gramm.",
+    "adj./n.": "形容词/名词兼类", "adj./n.f.": "形容词/阴性名词兼类", "n./adj.": "名词/形容词兼类"
+  };
+  var POS_SUBCAT_TO_MAJOR = {};
+  POS_MAJOR_ORDER.forEach(function (m) {
+    POS_MAJOR_GROUPS[m].forEach(function (p) { POS_SUBCAT_TO_MAJOR[p] = m; });
+  });
+
   var VOCAB = [
-        // 时间 Temps et dates
+    // 时间 Temps et dates
     {fr:"aujourd'hui", ipa:"oʒuʁdɥi", pos:"adv.", en:"today", zh:"今天", cat:"时间"},
     {fr:"demain", ipa:"dəmɛ̃", pos:"adv.", en:"tomorrow", zh:"明天", cat:"时间"},
     {fr:"hier", ipa:"jɛʁ", pos:"adv.", en:"yesterday", zh:"昨天", cat:"时间"},
@@ -3793,6 +3829,7 @@
     w.id = i;
     w.level = ADVANCED_CATS.indexOf(w.cat) !== -1 ? "进阶" : "基础";
     w.major = SUBCAT_TO_MAJOR[w.cat] || "其他";
+    w.posMajor = POS_SUBCAT_TO_MAJOR[w.pos] || "其他/兼类";
   });
 
   // Mastered words are keyed by the French headword itself (not array position),
@@ -3888,10 +3925,13 @@
 
   var categories = [];
   VOCAB.forEach(function (w) { if (categories.indexOf(w.cat) === -1) categories.push(w.cat); });
+  var posValues = [];
+  VOCAB.forEach(function (w) { if (posValues.indexOf(w.pos) === -1) posValues.push(w.pos); });
 
   var state = {
     tab: "study",
     level: "全部",
+    classifyBy: "topic", // "topic" (主题分类) or "pos" (词性分类) -- two parallel, mutually exclusive views
     major: "全部",
     cat: "全部",
     query: "",
@@ -3899,10 +3939,71 @@
     shuffle: false
   };
 
-  var catCounts = {};
-  VOCAB.forEach(function (w) { catCounts[w.cat] = (catCounts[w.cat] || 0) + 1; });
-  function sumCounts(catList) {
-    return catList.reduce(function (n, c) { return n + (catCounts[c] || 0); }, 0);
+  // { all: {sub: count}, byLevel: {"基础": {...}, "进阶": {...}} } for a given
+  // sub-category accessor, so per-level counts don't need re-scanning VOCAB
+  // on every pill-row render.
+  function buildSubCounts(subOf) {
+    var all = {}, byLevel = { "基础": {}, "进阶": {} };
+    VOCAB.forEach(function (w) {
+      var s = subOf(w);
+      all[s] = (all[s] || 0) + 1;
+      byLevel[w.level][s] = (byLevel[w.level][s] || 0) + 1;
+    });
+    return { all: all, byLevel: byLevel };
+  }
+
+  // Two parallel ways to browse the same word list: by topic (主题分类, the
+  // original 主题大类/子分类) or by part of speech (词性分类, 词性大类/子
+  // 类). Only one is active at a time (state.classifyBy); both share the same
+  // major/cat filter slots and the same pill-row UI area.
+  var SCHEMES = {
+    topic: {
+      switchLabel: "🗂 主题分类",
+      majorLabel: "主题大类",
+      subCatLabel: "子分类",
+      majorOrder: MAJOR_ORDER,
+      subToMajor: SUBCAT_TO_MAJOR,
+      allSubs: categories,
+      counts: buildSubCounts(function (w) { return w.cat; }),
+      subLabel: function (s) { return s; }
+    },
+    pos: {
+      switchLabel: "🔤 词性分类",
+      majorLabel: "词性大类",
+      subCatLabel: "词性子类",
+      majorOrder: POS_MAJOR_ORDER,
+      subToMajor: POS_SUBCAT_TO_MAJOR,
+      allSubs: posValues,
+      counts: buildSubCounts(function (w) { return w.pos; }),
+      subLabel: function (s) { return POS_LABELS[s] || s; }
+    }
+  };
+
+  function currentScheme() { return SCHEMES[state.classifyBy]; }
+  function wordSub(w) { return state.classifyBy === "pos" ? w.pos : w.cat; }
+  function wordMajor(w) { return state.classifyBy === "pos" ? w.posMajor : w.major; }
+
+  // sub-values (topic cats, or pos tags) that actually occur at a given level
+  function subsForLevel(lvl) {
+    var scheme = currentScheme();
+    if (lvl === "全部") return scheme.allSubs;
+    var counts = scheme.counts.byLevel[lvl] || {};
+    return scheme.allSubs.filter(function (s) { return (counts[s] || 0) > 0; });
+  }
+  // further narrowed to one major (or all majors)
+  function subsForFilter(lvl, major) {
+    var scheme = currentScheme();
+    var base = subsForLevel(lvl);
+    if (major === "全部") return base;
+    return base.filter(function (s) { return scheme.subToMajor[s] === major; });
+  }
+  function subCount(sub, lvl) {
+    var scheme = currentScheme();
+    var counts = lvl === "全部" ? scheme.counts.all : (scheme.counts.byLevel[lvl] || {});
+    return counts[sub] || 0;
+  }
+  function sumCounts(subList, lvl) {
+    return subList.reduce(function (n, s) { return n + subCount(s, lvl); }, 0);
   }
 
   var deck = [];
@@ -3910,6 +4011,8 @@
 
   // ---------- element refs ----------
   var levelBar = document.getElementById("levelBar");
+  var schemeBar = document.getElementById("schemeBar");
+  var majorLabel = document.getElementById("majorLabel");
   var majorBar = document.getElementById("majorBar");
   var subCatLabel = document.getElementById("subCatLabel");
   var catBar = document.getElementById("catBar");
@@ -3968,18 +4071,23 @@
     return arr;
   }
 
-  function catsForLevel(lvl) {
-    if (lvl === "全部") return categories;
-    return categories.filter(function (c) {
-      return (ADVANCED_CATS.indexOf(c) !== -1) === (lvl === "进阶");
+  function buildSchemeBar() {
+    var keys = ["topic", "pos"];
+    schemeBar.innerHTML = "";
+    keys.forEach(function (key) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.setAttribute("aria-pressed", String(key === state.classifyBy));
+      btn.textContent = SCHEMES[key].switchLabel;
+      btn.addEventListener("click", function () {
+        if (state.classifyBy === key) return;
+        state.classifyBy = key;
+        state.major = "全部";
+        state.cat = "全部";
+        onFiltersChanged();
+      });
+      schemeBar.appendChild(btn);
     });
-  }
-
-  // sub-categories available under the current level, further narrowed to one major (or all majors)
-  function catsForFilter(lvl, major) {
-    var base = catsForLevel(lvl);
-    if (major === "全部") return base;
-    return base.filter(function (c) { return SUBCAT_TO_MAJOR[c] === major; });
   }
 
   function buildLevelBar() {
@@ -3994,11 +4102,12 @@
       btn.innerHTML = (lvl === "全部" ? "全部难度" : lvl) + '<span class="n">' + count + "</span>";
       btn.addEventListener("click", function () {
         state.level = lvl;
-        var levelCats = catsForLevel(lvl);
-        if (state.major !== "全部" && !levelCats.some(function (c) { return SUBCAT_TO_MAJOR[c] === state.major; })) {
+        var levelSubs = subsForLevel(lvl);
+        var scheme = currentScheme();
+        if (state.major !== "全部" && !levelSubs.some(function (s) { return scheme.subToMajor[s] === state.major; })) {
           state.major = "全部";
         }
-        if (levelCats.indexOf(state.cat) === -1) state.cat = "全部";
+        if (levelSubs.indexOf(state.cat) === -1) state.cat = "全部";
         onFiltersChanged();
       });
       levelBar.appendChild(btn);
@@ -4006,15 +4115,17 @@
   }
 
   function buildMajorBar() {
-    var levelCats = catsForLevel(state.level);
-    var present = MAJOR_ORDER.filter(function (m) {
-      return levelCats.some(function (c) { return SUBCAT_TO_MAJOR[c] === m; });
+    var scheme = currentScheme();
+    majorLabel.textContent = scheme.majorLabel;
+    var levelSubs = subsForLevel(state.level);
+    var present = scheme.majorOrder.filter(function (m) {
+      return levelSubs.some(function (s) { return scheme.subToMajor[s] === m; });
     });
     var all = ["全部"].concat(present);
     majorBar.innerHTML = "";
     all.forEach(function (major) {
-      var cats = major === "全部" ? levelCats : levelCats.filter(function (c) { return SUBCAT_TO_MAJOR[c] === major; });
-      var count = sumCounts(cats);
+      var subs = major === "全部" ? levelSubs : levelSubs.filter(function (s) { return scheme.subToMajor[s] === major; });
+      var count = sumCounts(subs, state.level);
       var btn = document.createElement("button");
       btn.type = "button";
       btn.setAttribute("aria-pressed", String(major === state.major));
@@ -4029,6 +4140,7 @@
   }
 
   function buildCatBar() {
+    var scheme = currentScheme();
     if (state.major === "全部") {
       catBar.innerHTML = "";
       catBar.hidden = true;
@@ -4037,17 +4149,18 @@
     }
     catBar.hidden = false;
     subCatLabel.hidden = false;
-    var avail = catsForFilter(state.level, state.major);
+    subCatLabel.textContent = scheme.subCatLabel;
+    var avail = subsForFilter(state.level, state.major);
     var all = ["全部"].concat(avail);
     catBar.innerHTML = "";
-    all.forEach(function (cat) {
-      var count = cat === "全部" ? sumCounts(avail) : (catCounts[cat] || 0);
+    all.forEach(function (sub) {
+      var count = sub === "全部" ? sumCounts(avail, state.level) : subCount(sub, state.level);
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.setAttribute("aria-pressed", String(cat === state.cat));
-      btn.innerHTML = cat + '<span class="n">' + count + "</span>";
+      btn.setAttribute("aria-pressed", String(sub === state.cat));
+      btn.innerHTML = scheme.subLabel(sub) + '<span class="n">' + count + "</span>";
       btn.addEventListener("click", function () {
-        state.cat = cat;
+        state.cat = sub;
         onFiltersChanged();
       });
       catBar.appendChild(btn);
@@ -4081,8 +4194,8 @@
     var q = state.query.trim().toLowerCase();
     return VOCAB.filter(function (w) {
       if (state.level !== "全部" && w.level !== state.level) return false;
-      if (state.major !== "全部" && w.major !== state.major) return false;
-      if (state.cat !== "全部" && w.cat !== state.cat) return false;
+      if (state.major !== "全部" && wordMajor(w) !== state.major) return false;
+      if (state.cat !== "全部" && wordSub(w) !== state.cat) return false;
       if (forStudy && onlyDueStudy.checked && !isDue(w.fr)) return false;
       if (!forStudy && onlyUnmasteredList.checked && isMastered(w.fr)) return false;
       if (!forStudy && q) {
@@ -4331,6 +4444,7 @@
   tabListBtn.addEventListener("click", function () { setTab("list"); });
 
   function onFiltersChanged() {
+    buildSchemeBar();
     buildLevelBar();
     buildMajorBar();
     buildCatBar();
@@ -4426,8 +4540,8 @@
   function getQuizPool() {
     return VOCAB.filter(function (w) {
       if (state.level !== "全部" && w.level !== state.level) return false;
-      if (state.major !== "全部" && w.major !== state.major) return false;
-      if (state.cat !== "全部" && w.cat !== state.cat) return false;
+      if (state.major !== "全部" && wordMajor(w) !== state.major) return false;
+      if (state.cat !== "全部" && wordSub(w) !== state.cat) return false;
       return true;
     });
   }
@@ -4518,6 +4632,7 @@
   quizRestartBtn.addEventListener("click", function () { buildQuizRound(); });
 
   // ---------- init ----------
+  buildSchemeBar();
   buildLevelBar();
   buildMajorBar();
   buildCatBar();
