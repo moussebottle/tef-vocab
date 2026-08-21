@@ -256,6 +256,17 @@
   .scramble-build .chip.correct { background: color-mix(in srgb, #6fae7c 18%, var(--surface)); border-color: #6fae7c; }
   .scramble-build .chip.wrong { background: color-mix(in srgb, #d97a6b 14%, var(--surface)); border-color: #d97a6b; }
   #conjTableWrap .list-wrap { margin-top: 12px; }
+  .confus-group {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px;
+  }
+  .confus-group .confus-note { font-size: .8rem; color: var(--ink-muted); margin-bottom: 10px; line-height: 1.55; }
+  .confus-word { padding: 8px 0; border-top: 1px dashed var(--line); }
+  .confus-word:first-of-type { border-top: none; }
+  .confus-word .confus-fr { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; }
+  .confus-word .confus-zh { font-size: .85rem; color: var(--ink); margin-left: 8px; }
+  .confus-word .confus-ex { display: block; font-size: .82rem; color: var(--ink-muted); margin-top: 4px; }
+  .confus-word .confus-ex em { color: var(--ink); font-style: italic; }
 
   /* ---------- List view ---------- */
   .list-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-top: 14px; }
@@ -365,6 +376,7 @@
       <button type="button" id="pmDictationBtn" aria-pressed="false">🔊 听写</button>
       <button type="button" id="pmScrambleBtn" aria-pressed="false">🔀 造句</button>
       <button type="button" id="pmConjBtn" aria-pressed="false">📐 变位</button>
+      <button type="button" id="pmConfusBtn" aria-pressed="false">⚡ 易混词</button>
     </div>
 
     <div id="modeChoice">
@@ -431,6 +443,27 @@
             <tbody id="conjTableBody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <div id="modeConfus" hidden>
+      <div class="pillrow" id="confusSubBar">
+        <button type="button" id="confusDrillBtn" aria-pressed="true">测验</button>
+        <button type="button" id="confusBrowseBtn" aria-pressed="false">讲解</button>
+      </div>
+      <div id="confusDrillWrap">
+        <div class="opts">
+          <span class="quiz-score" id="confusScore">本轮：0 / 0</span>
+          <button class="reshuffle" id="confusRestartBtn" type="button">🔄 换一批</button>
+        </div>
+        <div class="quiz-card" id="confusArea">
+          <div class="quiz-question" id="confusQuestion"></div>
+          <div class="quiz-options" id="confusOptions"></div>
+          <button class="quiz-next-btn" id="confusNextBtn" type="button" hidden>下一题 →</button>
+        </div>
+      </div>
+      <div id="confusBrowseWrap" hidden>
+        <div id="confusBrowseList"></div>
       </div>
     </div>
   </section>
@@ -4180,6 +4213,19 @@
   var conjNextBtn = document.getElementById("conjNextBtn");
   var conjTableBody = document.getElementById("conjTableBody");
 
+  var pmConfusBtn = document.getElementById("pmConfusBtn");
+  var modeConfus = document.getElementById("modeConfus");
+  var confusDrillBtn = document.getElementById("confusDrillBtn");
+  var confusBrowseBtn = document.getElementById("confusBrowseBtn");
+  var confusDrillWrap = document.getElementById("confusDrillWrap");
+  var confusBrowseWrap = document.getElementById("confusBrowseWrap");
+  var confusScoreEl = document.getElementById("confusScore");
+  var confusRestartBtn = document.getElementById("confusRestartBtn");
+  var confusQuestionEl = document.getElementById("confusQuestion");
+  var confusOptionsEl = document.getElementById("confusOptions");
+  var confusNextBtn = document.getElementById("confusNextBtn");
+  var confusBrowseList = document.getElementById("confusBrowseList");
+
   var searchInput = document.getElementById("searchInput");
   var listEmpty = document.getElementById("listEmpty");
   var listWrap = document.getElementById("listWrap");
@@ -4598,6 +4644,7 @@
       else if (state.practiceMode === "dictation" && dictQueue.length === 0) buildDictRound();
       else if (state.practiceMode === "scramble" && scrambleQueue.length === 0) buildScrambleRound();
       else if (state.practiceMode === "conj" && conjQueue.length === 0) buildConjRound();
+      else if (state.practiceMode === "confus" && confusQueue.length === 0) buildConfusRound();
     }
   }
   tabStudyBtn.addEventListener("click", function () { setTab("study"); });
@@ -5110,23 +5157,226 @@
   conjDrillBtn.addEventListener("click", function () { setConjView("drill"); });
   conjTableBtn.addEventListener("click", function () { setConjView("table"); });
 
-  // ---------- practice mode switcher (选择题 / 听写 / 造句 / 变位) ----------
+  // ---------- practice: confusable word pairs (易混词) ----------
+  // Each group is a set of genuinely confusable French words -- near-synonyms
+  // that split a meaning English/Chinese speakers lump together (savoir vs
+  // connaître), or classic "false friend" traps (actuellement looks like
+  // "actually" but means "currently"). `exBlank` is hand-authored (not
+  // auto-generated from `ex`) so the gap always lands cleanly regardless of
+  // conjugation or elision.
+  var CONFUSABLES = [
+    { note: "amener/emmener 带的是人（或动物），apporter/emporter 带的是物品；amener/apporter 强调带到这里，emmener/emporter 强调带离开。", words: [
+      { fr: "amener", zh: "把（人）带来", ex: "Tu peux amener ton frère à la fête.", exBlank: "Tu peux ___ ton frère à la fête.", exZh: "你可以带你弟弟来参加派对。" },
+      { fr: "emmener", zh: "把（人）带走", ex: "Elle va emmener les enfants au cinéma.", exBlank: "Elle va ___ les enfants au cinéma.", exZh: "她要带孩子们去看电影。" },
+      { fr: "apporter", zh: "把（物）带来", ex: "Elle va apporter un gâteau à la fête.", exBlank: "Elle va ___ un gâteau à la fête.", exZh: "她要带一个蛋糕来参加聚会。" },
+      { fr: "emporter", zh: "把（物）带走", ex: "Je vais emporter ces livres chez moi.", exBlank: "Je vais ___ ces livres chez moi.", exZh: "我要把这些书带回家。" }
+    ]},
+    { note: "savoir 是知道事实、或「会」做某事（+动词原形）；connaître 是认识人、熟悉地方或事物，后面只能接名词。", words: [
+      { fr: "savoir", zh: "知道（事实），会（技能）", ex: "Elle sait nager très bien.", exBlank: "Elle ___ nager très bien.", exZh: "她很会游泳。" },
+      { fr: "connaître", zh: "认识（人），熟悉（地方）", ex: "Je connais bien ce quartier.", exBlank: "Je ___ bien ce quartier.", exZh: "我很熟悉这个街区。" }
+    ]},
+    { note: "écouter 是主动、专注地听；entendre 是被动听见、感知到声音。", words: [
+      { fr: "écouter", zh: "听（主动，专注）", ex: "Écoute bien la consigne avant de commencer.", exBlank: "___ bien la consigne avant de commencer.", exZh: "开始之前认真听指令。" },
+      { fr: "entendre", zh: "听见（被动感知）", ex: "J'ai entendu un bruit bizarre cette nuit.", exBlank: "J'ai ___ un bruit bizarre cette nuit.", exZh: "我昨晚听到一个奇怪的声音。" }
+    ]},
+    { note: "regarder 是主动看、注视；voir 是被动看见、感知到画面。跟 écouter/entendre 是同一种主动/被动对照。", words: [
+      { fr: "regarder", zh: "看，注视（主动）", ex: "Il regarde la télévision tous les soirs.", exBlank: "Il ___ la télévision tous les soirs.", exZh: "他每天晚上看电视。" },
+      { fr: "voir", zh: "看见（被动感知）", ex: "J'ai vu un bel oiseau ce matin.", exBlank: "J'ai ___ un bel oiseau ce matin.", exZh: "我今天早上看见一只漂亮的鸟。" }
+    ]},
+    { note: "partir 不接宾语，强调出发/离开这个动作本身；sortir 强调从里到外走出去；quitter 必须接宾语（地方/人/工作）。", words: [
+      { fr: "partir", zh: "出发，离开（不接宾语）", ex: "Le train part dans dix minutes.", exBlank: "Le train ___ dans dix minutes.", exZh: "火车十分钟后出发。" },
+      { fr: "sortir", zh: "出去（强调从里到外）", ex: "Elle sort du bureau à dix-huit heures.", exBlank: "Elle ___ du bureau à dix-huit heures.", exZh: "她晚上六点走出办公室。" },
+      { fr: "quitter", zh: "离开（必须接宾语：地方/人/工作）", ex: "Il a quitté son travail le mois dernier.", exBlank: "Il a ___ son travail le mois dernier.", exZh: "他上个月辞去了工作。" }
+    ]},
+    { note: "depuis＝自从/已经（从过去持续到现在）；il y a＝……以前（动作已完成，不再持续）；pendant＝明确的一段时长；pour＝计划中的未来时长。", words: [
+      { fr: "depuis", zh: "自从/已经……", ex: "J'habite dans cette ville depuis 2010.", exBlank: "J'habite dans cette ville ___ 2010.", exZh: "我从2010年起就住在这座城市。" },
+      { fr: "il y a", zh: "……以前", ex: "Il est arrivé il y a deux heures.", exBlank: "Il est arrivé ___ deux heures.", exZh: "他两个小时前到的。" },
+      { fr: "pendant", zh: "在……期间", ex: "J'ai attendu pendant deux heures.", exBlank: "J'ai attendu ___ deux heures.", exZh: "我等了两个小时。" },
+      { fr: "pour", zh: "为期……", ex: "Je pars pour deux semaines.", exBlank: "Je pars ___ deux semaines.", exZh: "我要出发去待两周。" }
+    ]},
+    { note: "bon 是形容词，修饰名词；bien 是副词，修饰动词。就像英语 good/well 的区别。", words: [
+      { fr: "bon", zh: "好的（形容词）", ex: "Ce gâteau est très bon.", exBlank: "Ce gâteau est très ___.", exZh: "这个蛋糕很好吃。" },
+      { fr: "bien", zh: "好地（副词）", ex: "Il travaille très bien.", exBlank: "Il travaille très ___.", exZh: "他工作做得很好。" }
+    ]},
+    { note: "两个词发音完全一样（都读 /plyto/），拼写和意思却不同：plus tôt 是「更早」，plutôt 是「更愿意，反而」。", words: [
+      { fr: "plus tôt", zh: "更早（时间比较）", ex: "Il est arrivé plus tôt que prévu.", exBlank: "Il est arrivé ___ que prévu.", exZh: "他比预期来得更早。" },
+      { fr: "plutôt", zh: "更愿意，反而，倒是", ex: "C'est plutôt une bonne idée.", exBlank: "C'est ___ une bonne idée.", exZh: "这倒算是个不错的主意。" }
+    ]},
+    { note: "阳性短形式（an/jour/matin/soir）常跟数字连用，强调计数；阴性长形式（année/journée/matinée/soirée）强调整段过程或经历。", words: [
+      { fr: "an", zh: "年（计数）", ex: "Elle a vingt-cinq ans.", exBlank: "Elle a vingt-cinq ___.", exZh: "她二十五岁。" },
+      { fr: "année", zh: "年（强调整年）", ex: "J'ai beaucoup voyagé cette année.", exBlank: "J'ai beaucoup voyagé cette ___.", exZh: "我今年旅行了很多。" },
+      { fr: "jour", zh: "天（计数）", ex: "Il reste ici trois jours.", exBlank: "Il reste ici trois ___.", exZh: "他在这里待三天。" },
+      { fr: "journée", zh: "一整天（强调过程）", ex: "J'ai passé une journée fantastique.", exBlank: "J'ai passé une ___ fantastique.", exZh: "我度过了美好的一天。" },
+      { fr: "matin", zh: "早上（时间点）", ex: "Je me lève tôt le matin.", exBlank: "Je me lève tôt le ___.", exZh: "我早上起得早。" },
+      { fr: "matinée", zh: "上午（强调整段时间）", ex: "Il a plu toute la matinée.", exBlank: "Il a plu toute la ___.", exZh: "整个上午都在下雨。" },
+      { fr: "soir", zh: "晚上（时间点）", ex: "Je rentre tard ce soir.", exBlank: "Je rentre tard ce ___.", exZh: "我今晚很晚回家。" },
+      { fr: "soirée", zh: "晚会，一整个晚上", ex: "Nous organisons une soirée samedi.", exBlank: "Nous organisons une ___ samedi.", exZh: "我们周六办一个晚会。" }
+    ]},
+    { note: "c'est + 名词/代词（常带冠词）；il/elle est + 形容词，或不带冠词的职业。", words: [
+      { fr: "c'est", zh: "这是……（+名词）", ex: "C'est un médecin très gentil.", exBlank: "___ un médecin très gentil.", exZh: "这是一位很和善的医生。" },
+      { fr: "il est", zh: "他是……（+形容词/职业）", ex: "Il est médecin depuis dix ans.", exBlank: "___ médecin depuis dix ans.", exZh: "他当医生已经十年了。" }
+    ]},
+    { note: "emprunter＝借入（从别人那里借来）；prêter＝借出（把东西借给别人）——方向正好相反，很容易搞反。", words: [
+      { fr: "emprunter", zh: "借入", ex: "J'ai emprunté ce livre à la bibliothèque.", exBlank: "J'ai ___ ce livre à la bibliothèque.", exZh: "我从图书馆借了这本书。" },
+      { fr: "prêter", zh: "借出", ex: "Peux-tu me prêter ta voiture ?", exBlank: "Peux-tu me ___ ta voiture ?", exZh: "你能把车借给我吗？" }
+    ]},
+    { note: "rendre＝归还某物；retourner＝返回某地（一般语境）；revenir＝回到说话人所在地；rentrer＝回家/回到内部。", words: [
+      { fr: "rendre", zh: "归还（某物）", ex: "Je dois rendre ce livre demain.", exBlank: "Je dois ___ ce livre demain.", exZh: "我明天得把这本书还回去。" },
+      { fr: "retourner", zh: "返回（某地）", ex: "Il veut retourner en France l'été prochain.", exBlank: "Il veut ___ en France l'été prochain.", exZh: "他明年夏天想回法国。" },
+      { fr: "revenir", zh: "回来（到说话人所在地）", ex: "Elle revient dans une heure.", exBlank: "Elle ___ dans une heure.", exZh: "她一小时后回来。" },
+      { fr: "rentrer", zh: "回家/回到内部", ex: "Je rentre chez moi à dix-huit heures.", exBlank: "Je ___ chez moi à dix-huit heures.", exZh: "我晚上六点回家。" }
+    ]},
+    { note: "actuellement 是「假朋友」：长得像英语 actually，意思却是「目前」，不是「实际上」。「实际上」要用 en fait。", words: [
+      { fr: "actuellement", zh: "目前，现在", ex: "Actuellement, il travaille à Lyon.", exBlank: "___, il travaille à Lyon.", exZh: "他目前在里昂工作。" },
+      { fr: "en fait", zh: "实际上，其实", ex: "En fait, je ne suis pas d'accord.", exBlank: "___, je ne suis pas d'accord.", exZh: "其实，我不同意。" }
+    ]},
+    { note: "librairie 是「假朋友」：长得像英语 library，意思却是「书店」。「图书馆」要用 bibliothèque。", words: [
+      { fr: "librairie", zh: "书店", ex: "J'ai acheté ce roman dans une petite librairie.", exBlank: "J'ai acheté ce roman dans une petite ___.", exZh: "我在一家小书店买了这本小说。" },
+      { fr: "bibliothèque", zh: "图书馆", ex: "Elle étudie souvent à la bibliothèque.", exBlank: "Elle étudie souvent à la ___.", exZh: "她经常在图书馆学习。" }
+    ]},
+    { note: "rester 是「假朋友」：长得像英语 rest，意思却是「待着，停留」。「休息」要用 se reposer。", words: [
+      { fr: "rester", zh: "待着，停留", ex: "Je reste à la maison ce soir.", exBlank: "Je ___ à la maison ce soir.", exZh: "我今晚待在家里。" },
+      { fr: "se reposer", zh: "休息", ex: "Tu devrais te reposer un peu.", exBlank: "Tu devrais te ___ un peu.", exZh: "你应该稍微休息一下。" }
+    ]},
+    { note: "assister à 是「假朋友」：意思是「参加，出席」，不是「协助」。attendre 也是「假朋友」：长得像英语 attend，意思却是「等待」。", words: [
+      { fr: "assister à", zh: "参加，出席", ex: "Nous allons assister à la réunion.", exBlank: "Nous allons ___ la réunion.", exZh: "我们要参加这次会议。" },
+      { fr: "attendre", zh: "等待", ex: "J'attends le bus depuis dix minutes.", exBlank: "J'___ le bus depuis dix minutes.", exZh: "我等公交车已经十分钟了。" }
+    ]},
+    { note: "sensible 是「假朋友」：长得像英语 sensible，意思却是「敏感的」。「明智的」要用 sensé(e)。", words: [
+      { fr: "sensible", zh: "敏感的", ex: "Elle est très sensible aux critiques.", exBlank: "Elle est très ___ aux critiques.", exZh: "她对批评很敏感。" },
+      { fr: "sensé(e)", zh: "明智的，理性的", ex: "C'est une décision sensée.", exBlank: "C'est une décision ___.", exZh: "这是一个明智的决定。" }
+    ]},
+    { note: "large 是「假朋友」：长得像英语 large，意思却是「宽的」。「大的」要用 grand(e)。", words: [
+      { fr: "large", zh: "宽的", ex: "Cette avenue est très large.", exBlank: "Cette avenue est très ___.", exZh: "这条大道很宽。" },
+      { fr: "grand(e)", zh: "大的，高大的", ex: "C'est un très grand bâtiment.", exBlank: "C'est un très ___ bâtiment.", exZh: "这是一栋非常高大的建筑。" }
+    ]},
+    { note: "passer un examen 是「假朋友」：意思是「参加考试」，考试结果未知；真正的「通过考试」要说 réussir un examen。", words: [
+      { fr: "passer", zh: "参加，经历（考试等）", ex: "Elle passe son examen de français demain.", exBlank: "Elle ___ son examen de français demain.", exZh: "她明天要参加法语考试。" },
+      { fr: "réussir", zh: "通过，成功", ex: "Il a réussi son examen haut la main.", exBlank: "Il a ___ son examen haut la main.", exZh: "他轻松通过了考试。" }
+    ]}
+  ];
+
+  var confusQueue = [];
+  var confusIndex = 0;
+  var confusScore = { correct: 0, total: 0 };
+
+  function buildConfusRound() {
+    confusScore = { correct: 0, total: 0 };
+    var items = [];
+    CONFUSABLES.forEach(function (g) {
+      g.words.forEach(function (w) { items.push({ group: g, word: w }); });
+    });
+    shuffleArr(items);
+    confusQueue = items.slice(0, QUIZ_ROUND_SIZE);
+    confusIndex = 0;
+    renderConfusQuestion();
+  }
+
+  function renderConfusQuestion() {
+    confusScoreEl.textContent = "本轮：" + confusScore.correct + " / " + confusScore.total;
+    if (confusIndex >= confusQueue.length) {
+      confusQuestionEl.innerHTML =
+        '<span class="fr-word">本轮完成！</span>' +
+        '<span class="srs-info" style="display:block;margin-top:6px;">答对 ' + confusScore.correct + ' / ' + confusScore.total + ' 题</span>';
+      confusOptionsEl.innerHTML = "";
+      confusNextBtn.hidden = true;
+      return;
+    }
+    var item = confusQueue[confusIndex];
+    var g = item.group, w = item.word;
+    var correct = w.fr;
+    confusQuestionEl.innerHTML =
+      '<span class="srs-info">' + w.exZh + '</span>' +
+      '<span class="fr-word" style="display:block;font-size:1.15rem;margin-top:8px;">' + w.exBlank + '</span>';
+
+    var options = g.words.map(function (o) { return o.fr; });
+    shuffleArr(options);
+
+    confusNextBtn.hidden = true;
+    confusOptionsEl.innerHTML = "";
+    options.forEach(function (opt) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quiz-option";
+      btn.textContent = opt;
+      btn.addEventListener("click", function () { answerConfus(correct, opt, btn, w); });
+      confusOptionsEl.appendChild(btn);
+    });
+  }
+
+  function answerConfus(correct, chosen, chosenBtn, w) {
+    var buttons = confusOptionsEl.querySelectorAll(".quiz-option");
+    var isCorrect = chosen === correct;
+    confusScore.total++;
+    if (isCorrect) confusScore.correct++;
+    buttons.forEach(function (b) {
+      b.disabled = true;
+      if (b.textContent === correct) b.classList.add("correct");
+      else if (b === chosenBtn) b.classList.add("wrong");
+    });
+    var exLine = document.createElement("div");
+    exLine.className = "example";
+    exLine.innerHTML = '<span class="ex-fr">' + w.ex + '</span>';
+    confusOptionsEl.appendChild(exLine);
+    confusScoreEl.textContent = "本轮：" + confusScore.correct + " / " + confusScore.total;
+    confusNextBtn.hidden = false;
+  }
+
+  function buildConfusBrowse() {
+    confusBrowseList.innerHTML = "";
+    CONFUSABLES.forEach(function (g) {
+      var card = document.createElement("div");
+      card.className = "confus-group";
+      var noteEl = document.createElement("div");
+      noteEl.className = "confus-note";
+      noteEl.textContent = g.note;
+      card.appendChild(noteEl);
+      g.words.forEach(function (w) {
+        var wordEl = document.createElement("div");
+        wordEl.className = "confus-word";
+        wordEl.innerHTML =
+          '<span class="confus-fr">' + w.fr + '</span><span class="confus-zh">' + w.zh + '</span>' +
+          '<span class="confus-ex"><em>' + w.ex + '</em> ' + w.exZh + '</span>';
+        card.appendChild(wordEl);
+      });
+      confusBrowseList.appendChild(card);
+    });
+  }
+
+  confusNextBtn.addEventListener("click", function () { confusIndex++; renderConfusQuestion(); });
+  confusRestartBtn.addEventListener("click", function () { buildConfusRound(); });
+
+  function setConfusView(view) {
+    confusDrillBtn.setAttribute("aria-pressed", String(view === "drill"));
+    confusBrowseBtn.setAttribute("aria-pressed", String(view === "browse"));
+    confusDrillWrap.hidden = view !== "drill";
+    confusBrowseWrap.hidden = view !== "browse";
+    if (view === "drill" && confusQueue.length === 0) buildConfusRound();
+  }
+  confusDrillBtn.addEventListener("click", function () { setConfusView("drill"); });
+  confusBrowseBtn.addEventListener("click", function () { setConfusView("browse"); });
+
+  // ---------- practice mode switcher (选择题 / 听写 / 造句 / 变位 / 易混词) ----------
   function setPracticeMode(mode) {
     state.practiceMode = mode;
     pmChoiceBtn.setAttribute("aria-pressed", String(mode === "choice"));
     pmDictationBtn.setAttribute("aria-pressed", String(mode === "dictation"));
     pmScrambleBtn.setAttribute("aria-pressed", String(mode === "scramble"));
     pmConjBtn.setAttribute("aria-pressed", String(mode === "conj"));
+    pmConfusBtn.setAttribute("aria-pressed", String(mode === "confus"));
     modeChoice.hidden = mode !== "choice";
     modeDictation.hidden = mode !== "dictation";
     modeScramble.hidden = mode !== "scramble";
     modeConj.hidden = mode !== "conj";
+    modeConfus.hidden = mode !== "confus";
     if (mode === "choice" && quizQueue.length === 0) buildQuizRound();
     if (mode === "dictation" && dictQueue.length === 0) buildDictRound();
     if (mode === "scramble" && scrambleQueue.length === 0) buildScrambleRound();
     if (mode === "conj" && conjQueue.length === 0) buildConjRound();
+    if (mode === "confus" && confusQueue.length === 0) buildConfusRound();
   }
   pmChoiceBtn.addEventListener("click", function () { setPracticeMode("choice"); });
+  pmConfusBtn.addEventListener("click", function () { setPracticeMode("confus"); });
   pmDictationBtn.addEventListener("click", function () { setPracticeMode("dictation"); });
   pmScrambleBtn.addEventListener("click", function () { setPracticeMode("scramble"); });
   pmConjBtn.addEventListener("click", function () { setPracticeMode("conj"); });
@@ -5141,6 +5391,7 @@
   renderList();
   buildQuizRound();
   buildConjTable();
+  buildConfusBrowse();
   setTab("study");
 })();
 </script>
