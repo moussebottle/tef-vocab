@@ -233,6 +233,29 @@
     display: block; width: 100%; margin-top: 16px; border: 1px solid var(--accent); background: var(--accent);
     color: var(--accent-ink); border-radius: 14px; padding: 13px; font-size: .95rem; font-weight: 700; cursor: pointer;
   }
+  .daily-hint { font-size: .74rem; color: var(--ink-muted); margin: -4px 0 10px; }
+
+  /* ---------- Practice sub-modes: dictation / scramble / conjugation ---------- */
+  .dict-speak {
+    display: block; width: 100%; border: 1px solid var(--accent); background: var(--orange);
+    color: var(--orange-ink); border-radius: 14px; padding: 16px; font-size: 1.05rem; font-weight: 700;
+    cursor: pointer; text-align: center;
+  }
+  .dict-speak:hover { background: var(--orange-strong); }
+  .scramble-build, .scramble-bank {
+    display: flex; flex-wrap: wrap; gap: 8px; min-height: 46px; align-content: flex-start;
+    padding: 10px; border-radius: 12px; margin-bottom: 10px;
+  }
+  .scramble-build { border: 1px dashed var(--line); background: var(--surface-2); }
+  .chip {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 10px; padding: 8px 12px; font-size: .95rem; cursor: pointer; font-family: var(--font-display);
+  }
+  .chip:hover:not(:disabled) { border-color: var(--accent); }
+  .chip:disabled { cursor: default; }
+  .scramble-build .chip.correct { background: color-mix(in srgb, #6fae7c 18%, var(--surface)); border-color: #6fae7c; }
+  .scramble-build .chip.wrong { background: color-mix(in srgb, #d97a6b 14%, var(--surface)); border-color: #d97a6b; }
+  #conjTableWrap .list-wrap { margin-top: 12px; }
 
   /* ---------- List view ---------- */
   .list-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-top: 14px; }
@@ -290,7 +313,7 @@
 
   <div class="tabbar" role="tablist">
     <button id="tabStudyBtn" role="tab" aria-selected="true" type="button">📇 闪卡背词</button>
-    <button id="tabQuizBtn" role="tab" aria-selected="false" type="button">🎯 测验</button>
+    <button id="tabQuizBtn" role="tab" aria-selected="false" type="button">🎯 练习</button>
     <button id="tabListBtn" role="tab" aria-selected="false" type="button">☰ 浏览列表</button>
   </div>
 
@@ -306,8 +329,10 @@
     <div class="opts">
       <label class="check"><input type="checkbox" id="shuffleCb" /> 乱序播放</label>
       <label class="check"><input type="checkbox" id="onlyDueStudy" /> 只看待复习</label>
+      <label class="check"><input type="checkbox" id="dailyModeCb" /> 🎯 今日学习包</label>
       <button class="reshuffle" id="reshuffleBtn" type="button" hidden>🔀 换个顺序</button>
     </div>
+    <p class="daily-hint" id="dailyHint" hidden>自动组合「到期复习词」+「最多 10 个新词」，不用手动筛选，学完当天该学的就够了。</p>
 
     <div id="studyEmpty" class="empty" hidden>这组条件下没有单词，换个分类或取消筛选试试。</div>
 
@@ -333,17 +358,80 @@
     </div>
   </section>
 
-  <!-- Quiz panel -->
+  <!-- Practice panel (multiple-choice quiz / dictation / sentence scramble / conjugation) -->
   <section id="quizPanel" hidden>
-    <div class="opts">
-      <span class="quiz-score" id="quizScore">本轮：0 / 0</span>
-      <button class="reshuffle" id="quizRestartBtn" type="button">🔄 换一批</button>
+    <div class="pillrow" id="practiceModeBar">
+      <button type="button" id="pmChoiceBtn" aria-pressed="true">🎯 选择题</button>
+      <button type="button" id="pmDictationBtn" aria-pressed="false">🔊 听写</button>
+      <button type="button" id="pmScrambleBtn" aria-pressed="false">🔀 造句</button>
+      <button type="button" id="pmConjBtn" aria-pressed="false">📐 变位</button>
     </div>
-    <div id="quizEmpty" class="empty" hidden>这组筛选条件下词太少（至少需要 4 个），换个大类或取消筛选试试。</div>
-    <div class="quiz-card" id="quizArea">
-      <div class="quiz-question" id="quizQuestion"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <button class="quiz-next-btn" id="quizNextBtn" type="button" hidden>下一题 →</button>
+
+    <div id="modeChoice">
+      <div class="opts">
+        <span class="quiz-score" id="quizScore">本轮：0 / 0</span>
+        <button class="reshuffle" id="quizRestartBtn" type="button">🔄 换一批</button>
+      </div>
+      <div id="quizEmpty" class="empty" hidden>这组筛选条件下词太少（至少需要 4 个），换个大类或取消筛选试试。</div>
+      <div class="quiz-card" id="quizArea">
+        <div class="quiz-question" id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <button class="quiz-next-btn" id="quizNextBtn" type="button" hidden>下一题 →</button>
+      </div>
+    </div>
+
+    <div id="modeDictation" hidden>
+      <div class="opts">
+        <span class="quiz-score" id="dictScore">本轮：0 / 0</span>
+        <button class="reshuffle" id="dictRestartBtn" type="button">🔄 换一批</button>
+      </div>
+      <div id="dictEmpty" class="empty" hidden>这组筛选条件下词太少（至少需要 4 个），换个大类或取消筛选试试。</div>
+      <div class="quiz-card" id="dictArea">
+        <div class="quiz-question" id="dictQuestion"></div>
+        <div class="quiz-options" id="dictOptions"></div>
+        <button class="quiz-next-btn" id="dictNextBtn" type="button" hidden>下一题 →</button>
+      </div>
+    </div>
+
+    <div id="modeScramble" hidden>
+      <div class="opts">
+        <span class="quiz-score" id="scrambleScore">本轮：0 / 0</span>
+        <button class="reshuffle" id="scrambleRestartBtn" type="button">🔄 换一批</button>
+      </div>
+      <div id="scrambleEmpty" class="empty" hidden>带例句的词还不够（句子至少要 3 个词），换个分类试试。</div>
+      <div class="quiz-card" id="scrambleArea">
+        <div class="quiz-question" id="scrambleHint"></div>
+        <div class="scramble-build" id="scrambleBuild"></div>
+        <div class="scramble-bank" id="scrambleBank"></div>
+        <button type="button" class="reshuffle" id="scrambleUndoBtn">↩ 撤销一个</button>
+        <button class="quiz-next-btn" id="scrambleNextBtn" type="button" hidden>下一题 →</button>
+      </div>
+    </div>
+
+    <div id="modeConj" hidden>
+      <div class="pillrow" id="conjSubBar">
+        <button type="button" id="conjDrillBtn" aria-pressed="true">测验</button>
+        <button type="button" id="conjTableBtn" aria-pressed="false">变位表</button>
+      </div>
+      <div id="conjDrillWrap">
+        <div class="opts">
+          <span class="quiz-score" id="conjScore">本轮：0 / 0</span>
+          <button class="reshuffle" id="conjRestartBtn" type="button">🔄 换一批</button>
+        </div>
+        <div class="quiz-card" id="conjArea">
+          <div class="quiz-question" id="conjQuestion"></div>
+          <div class="quiz-options" id="conjOptions"></div>
+          <button class="quiz-next-btn" id="conjNextBtn" type="button" hidden>下一题 →</button>
+        </div>
+      </div>
+      <div id="conjTableWrap" hidden>
+        <div class="list-wrap">
+          <table class="vlist" id="conjTable">
+            <thead><tr><th>动词</th><th>je</th><th>tu</th><th>il/elle</th><th>nous</th><th>vous</th><th>ils/elles</th></tr></thead>
+            <tbody id="conjTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -3936,7 +4024,8 @@
     cat: "全部",
     query: "",
     onlyUnmastered: false,
-    shuffle: false
+    shuffle: false,
+    practiceMode: "choice" // "choice" | "dictation" | "scramble" | "conj" -- sub-mode within the 练习 tab
   };
 
   // { all: {sub: count}, byLevel: {"基础": {...}, "进阶": {...}} } for a given
@@ -4025,6 +4114,8 @@
 
   var shuffleCb = document.getElementById("shuffleCb");
   var onlyDueStudy = document.getElementById("onlyDueStudy");
+  var dailyModeCb = document.getElementById("dailyModeCb");
+  var dailyHint = document.getElementById("dailyHint");
   var onlyUnmasteredList = document.getElementById("onlyUnmasteredList");
   var reshuffleBtn = document.getElementById("reshuffleBtn");
   var studyEmpty = document.getElementById("studyEmpty");
@@ -4042,6 +4133,16 @@
   var gradeHardBtn = document.getElementById("gradeHardBtn");
   var gradeGoodBtn = document.getElementById("gradeGoodBtn");
 
+  var practiceModeBar = document.getElementById("practiceModeBar");
+  var pmChoiceBtn = document.getElementById("pmChoiceBtn");
+  var pmDictationBtn = document.getElementById("pmDictationBtn");
+  var pmScrambleBtn = document.getElementById("pmScrambleBtn");
+  var pmConjBtn = document.getElementById("pmConjBtn");
+  var modeChoice = document.getElementById("modeChoice");
+  var modeDictation = document.getElementById("modeDictation");
+  var modeScramble = document.getElementById("modeScramble");
+  var modeConj = document.getElementById("modeConj");
+
   var quizScoreEl = document.getElementById("quizScore");
   var quizRestartBtn = document.getElementById("quizRestartBtn");
   var quizEmpty = document.getElementById("quizEmpty");
@@ -4049,6 +4150,35 @@
   var quizQuestionEl = document.getElementById("quizQuestion");
   var quizOptionsEl = document.getElementById("quizOptions");
   var quizNextBtn = document.getElementById("quizNextBtn");
+
+  var dictScoreEl = document.getElementById("dictScore");
+  var dictRestartBtn = document.getElementById("dictRestartBtn");
+  var dictEmpty = document.getElementById("dictEmpty");
+  var dictArea = document.getElementById("dictArea");
+  var dictQuestionEl = document.getElementById("dictQuestion");
+  var dictOptionsEl = document.getElementById("dictOptions");
+  var dictNextBtn = document.getElementById("dictNextBtn");
+
+  var scrambleScoreEl = document.getElementById("scrambleScore");
+  var scrambleRestartBtn = document.getElementById("scrambleRestartBtn");
+  var scrambleEmpty = document.getElementById("scrambleEmpty");
+  var scrambleArea = document.getElementById("scrambleArea");
+  var scrambleHint = document.getElementById("scrambleHint");
+  var scrambleBuild = document.getElementById("scrambleBuild");
+  var scrambleBank = document.getElementById("scrambleBank");
+  var scrambleUndoBtn = document.getElementById("scrambleUndoBtn");
+  var scrambleNextBtn = document.getElementById("scrambleNextBtn");
+
+  var conjDrillBtn = document.getElementById("conjDrillBtn");
+  var conjTableBtn = document.getElementById("conjTableBtn");
+  var conjDrillWrap = document.getElementById("conjDrillWrap");
+  var conjTableWrap = document.getElementById("conjTableWrap");
+  var conjScoreEl = document.getElementById("conjScore");
+  var conjRestartBtn = document.getElementById("conjRestartBtn");
+  var conjQuestionEl = document.getElementById("conjQuestion");
+  var conjOptionsEl = document.getElementById("conjOptions");
+  var conjNextBtn = document.getElementById("conjNextBtn");
+  var conjTableBody = document.getElementById("conjTableBody");
 
   var searchInput = document.getElementById("searchInput");
   var listEmpty = document.getElementById("listEmpty");
@@ -4190,13 +4320,13 @@
     return out;
   }
 
-  function getFiltered(forStudy) {
+  // level/major/cat/search filters only -- shared by study, list, and the daily-deck builder below
+  function getFilteredBase(forStudy) {
     var q = state.query.trim().toLowerCase();
     return VOCAB.filter(function (w) {
       if (state.level !== "全部" && w.level !== state.level) return false;
       if (state.major !== "全部" && wordMajor(w) !== state.major) return false;
       if (state.cat !== "全部" && wordSub(w) !== state.cat) return false;
-      if (forStudy && onlyDueStudy.checked && !isDue(w.fr)) return false;
       if (!forStudy && onlyUnmasteredList.checked && isMastered(w.fr)) return false;
       if (!forStudy && q) {
         if (w.fr.toLowerCase().indexOf(q) !== -1) return true;
@@ -4207,6 +4337,24 @@
       }
       return true;
     });
+  }
+
+  var DAILY_NEW_CAP = 10; // how many never-studied words the daily deck introduces at once
+
+  function getFiltered(forStudy) {
+    var base = getFilteredBase(forStudy);
+    if (forStudy && dailyModeCb.checked) {
+      // today's deck = every word that's due for review (already seen before) + a capped
+      // batch of fresh words, so there's no manual filter-juggling to "just study today".
+      var reviewWords = base.filter(function (w) { return srs[w.fr] && isDue(w.fr); });
+      var newWords = base.filter(function (w) { return !srs[w.fr]; });
+      shuffleArr(newWords);
+      return reviewWords.concat(newWords.slice(0, DAILY_NEW_CAP));
+    }
+    if (forStudy && onlyDueStudy.checked) {
+      return base.filter(function (w) { return isDue(w.fr); });
+    }
+    return base;
   }
 
   function updateStats() {
@@ -4303,7 +4451,7 @@
       renderStudyCard();
       return;
     }
-    if (onlyDueStudy.checked && !isDue(w.fr)) {
+    if ((onlyDueStudy.checked || dailyModeCb.checked) && !isDue(w.fr)) {
       deck.splice(deckIndex, 1);
       if (deckIndex >= deck.length) deckIndex = 0;
       renderStudyCard();
@@ -4356,7 +4504,15 @@
   });
 
   shuffleCb.addEventListener("change", function () { state.shuffle = shuffleCb.checked; rebuildDeck(); });
-  onlyDueStudy.addEventListener("change", function () { rebuildDeck(); });
+  onlyDueStudy.addEventListener("change", function () {
+    if (onlyDueStudy.checked) { dailyModeCb.checked = false; dailyHint.hidden = true; }
+    rebuildDeck();
+  });
+  dailyModeCb.addEventListener("change", function () {
+    if (dailyModeCb.checked) { onlyDueStudy.checked = false; }
+    dailyHint.hidden = !dailyModeCb.checked;
+    rebuildDeck();
+  });
 
   // ---------- list/browse ----------
   function renderList() {
@@ -4437,7 +4593,12 @@
     studyPanel.hidden = tab !== "study";
     quizPanel.hidden = tab !== "quiz";
     listPanel.hidden = tab !== "list";
-    if (tab === "quiz" && quizQueue.length === 0) buildQuizRound();
+    if (tab === "quiz") {
+      if (state.practiceMode === "choice" && quizQueue.length === 0) buildQuizRound();
+      else if (state.practiceMode === "dictation" && dictQueue.length === 0) buildDictRound();
+      else if (state.practiceMode === "scramble" && scrambleQueue.length === 0) buildScrambleRound();
+      else if (state.practiceMode === "conj" && conjQueue.length === 0) buildConjRound();
+    }
   }
   tabStudyBtn.addEventListener("click", function () { setTab("study"); });
   tabQuizBtn.addEventListener("click", function () { setTab("quiz"); });
@@ -4451,6 +4612,8 @@
     rebuildDeck();
     renderList();
     buildQuizRound();
+    buildDictRound();
+    buildScrambleRound();
   }
 
   resetBtn.addEventListener("click", function () {
@@ -4461,6 +4624,7 @@
     renderStudyCard();
     renderList();
     buildQuizRound();
+    buildDictRound();
   });
 
   // ---------- export / import progress (manual backup, independent of browser storage) ----------
@@ -4518,6 +4682,7 @@
         renderStudyCard();
         renderList();
         buildQuizRound();
+        buildDictRound();
         importMsg.textContent = "已导入 " + added + " 个词的学习记录。";
       } catch (e) {
         importMsg.textContent = "导入失败：文件格式不正确。";
@@ -4631,6 +4796,341 @@
   quizNextBtn.addEventListener("click", function () { quizIndex++; renderQuizQuestion(); });
   quizRestartBtn.addEventListener("click", function () { buildQuizRound(); });
 
+  // ---------- practice: dictation (hear it, pick the spelling) ----------
+  var dictQueue = [];
+  var dictIndex = 0;
+  var dictScore = { correct: 0, total: 0 };
+
+  function buildDictRound() {
+    var pool = getQuizPool();
+    dictScore = { correct: 0, total: 0 };
+    if (pool.length < 4) { dictQueue = []; dictIndex = 0; renderDictQuestion(); return; }
+    var due = pool.filter(function (w) { return isDue(w.fr); });
+    var rest = pool.filter(function (w) { return !isDue(w.fr); });
+    shuffleArr(due);
+    shuffleArr(rest);
+    dictQueue = due.concat(rest).slice(0, Math.min(QUIZ_ROUND_SIZE, pool.length));
+    dictIndex = 0;
+    renderDictQuestion();
+  }
+
+  function renderDictQuestion() {
+    var pool = getQuizPool();
+    var hasEnough = pool.length >= 4;
+    dictEmpty.hidden = hasEnough;
+    dictArea.hidden = !hasEnough;
+    dictScoreEl.textContent = "本轮：" + dictScore.correct + " / " + dictScore.total;
+    if (!hasEnough) return;
+
+    if (dictIndex >= dictQueue.length) {
+      dictQuestionEl.innerHTML =
+        '<span class="fr-word">本轮完成！</span>' +
+        '<span class="srs-info" style="display:block;margin-top:6px;">答对 ' + dictScore.correct + ' / ' + dictScore.total + ' 题</span>';
+      dictOptionsEl.innerHTML = "";
+      dictNextBtn.hidden = true;
+      return;
+    }
+
+    var w = dictQueue[dictIndex];
+    dictQuestionEl.innerHTML = TTS_OK
+      ? '<button type="button" class="speak-btn dict-speak" data-fr="' + w.fr + '">🔊 点击听发音</button>' +
+        '<span class="srs-info" style="display:block;margin-top:10px;">' + sensesOf(w)[0].zh + '</span>'
+      : '<span class="srs-info">此设备不支持语音朗读，听写模式无法使用</span>';
+    if (TTS_OK) speak(w.fr);
+
+    var distractPool = pool.filter(function (o) { return o.fr !== w.fr; });
+    shuffleArr(distractPool);
+    var options = [w.fr];
+    for (var i = 0; i < distractPool.length && options.length < 4; i++) {
+      if (options.indexOf(distractPool[i].fr) === -1) options.push(distractPool[i].fr);
+    }
+    shuffleArr(options);
+
+    dictNextBtn.hidden = true;
+    dictOptionsEl.innerHTML = "";
+    options.forEach(function (opt) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quiz-option";
+      btn.textContent = opt;
+      btn.addEventListener("click", function () { answerDict(w, opt, btn); });
+      dictOptionsEl.appendChild(btn);
+    });
+  }
+
+  function answerDict(w, chosen, chosenBtn) {
+    var buttons = dictOptionsEl.querySelectorAll(".quiz-option");
+    var isCorrect = chosen === w.fr;
+    dictScore.total++;
+    if (isCorrect) dictScore.correct++;
+    gradeWord(w.fr, isCorrect ? "good" : "again");
+    updateStats();
+    buttons.forEach(function (b) {
+      b.disabled = true;
+      if (b.textContent === w.fr) b.classList.add("correct");
+      else if (b === chosenBtn) b.classList.add("wrong");
+    });
+    dictScoreEl.textContent = "本轮：" + dictScore.correct + " / " + dictScore.total;
+    dictNextBtn.hidden = false;
+  }
+
+  dictNextBtn.addEventListener("click", function () { dictIndex++; renderDictQuestion(); });
+  dictRestartBtn.addEventListener("click", function () { buildDictRound(); });
+
+  // ---------- practice: sentence scramble (reassemble an example sentence) ----------
+  var scrambleQueue = [];
+  var scrambleIndex = 0;
+  var scrambleScore = { correct: 0, total: 0 };
+  var scrambleTokens = [];
+  var scrambleAnswered = false;
+
+  function getScramblePool() {
+    return getFilteredBase(false).filter(function (w) {
+      return w.ex && w.ex.trim().split(/\s+/).length >= 3;
+    });
+  }
+
+  function buildScrambleRound() {
+    var pool = getScramblePool();
+    scrambleScore = { correct: 0, total: 0 };
+    if (pool.length < 1) { scrambleQueue = []; scrambleIndex = 0; renderScrambleQuestion(); return; }
+    shuffleArr(pool);
+    scrambleQueue = pool.slice(0, Math.min(QUIZ_ROUND_SIZE, pool.length));
+    scrambleIndex = 0;
+    renderScrambleQuestion();
+  }
+
+  function renderScrambleQuestion() {
+    var pool = getScramblePool();
+    var hasEnough = pool.length >= 1;
+    scrambleEmpty.hidden = hasEnough;
+    scrambleArea.hidden = !hasEnough;
+    scrambleScoreEl.textContent = "本轮：" + scrambleScore.correct + " / " + scrambleScore.total;
+    if (!hasEnough) return;
+
+    if (scrambleIndex >= scrambleQueue.length) {
+      scrambleHint.innerHTML =
+        '<span class="fr-word" style="font-size:1.3rem;">本轮完成！</span>' +
+        '<span class="srs-info" style="display:block;margin-top:6px;">答对 ' + scrambleScore.correct + ' / ' + scrambleScore.total + ' 题</span>';
+      scrambleBuild.innerHTML = "";
+      scrambleBank.innerHTML = "";
+      scrambleUndoBtn.hidden = true;
+      scrambleNextBtn.hidden = true;
+      return;
+    }
+
+    var w = scrambleQueue[scrambleIndex];
+    scrambleAnswered = false;
+    scrambleTokens = w.ex.trim().split(/\s+/);
+    scrambleHint.innerHTML =
+      '<span class="srs-info">根据中文提示，点选下面的词拼出正确的法语句子</span>' +
+      '<span class="fr-word" style="display:block;font-size:1.1rem;margin-top:8px;">' + w.exZh + '</span>';
+
+    var bankTokens = scrambleTokens.slice();
+    var original = scrambleTokens.join(" ");
+    shuffleArr(bankTokens);
+    while (bankTokens.length > 1 && bankTokens.join(" ") === original) shuffleArr(bankTokens);
+
+    scrambleBuild.innerHTML = "";
+    scrambleBank.innerHTML = "";
+    scrambleUndoBtn.hidden = false;
+    scrambleNextBtn.hidden = true;
+
+    bankTokens.forEach(function (tok) {
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = tok;
+      chip.addEventListener("click", function () {
+        if (scrambleAnswered) return;
+        scrambleBank.removeChild(chip);
+        scrambleBuild.appendChild(chip);
+        if (scrambleBank.children.length === 0) checkScramble(w);
+      });
+      scrambleBank.appendChild(chip);
+    });
+  }
+
+  function checkScramble(w) {
+    scrambleAnswered = true;
+    var built = Array.prototype.map.call(scrambleBuild.children, function (c) { return c.textContent; });
+    var isCorrect = built.join(" ") === scrambleTokens.join(" ");
+    scrambleScore.total++;
+    if (isCorrect) scrambleScore.correct++;
+    gradeWord(w.fr, isCorrect ? "good" : "again");
+    updateStats();
+    Array.prototype.forEach.call(scrambleBuild.children, function (c) {
+      c.disabled = true;
+      c.classList.add(isCorrect ? "correct" : "wrong");
+    });
+    if (!isCorrect) {
+      var correctLine = document.createElement("div");
+      correctLine.className = "example";
+      correctLine.innerHTML = '<span class="ex-fr">' + w.ex + '</span>';
+      scrambleHint.appendChild(correctLine);
+    }
+    scrambleScoreEl.textContent = "本轮：" + scrambleScore.correct + " / " + scrambleScore.total;
+    scrambleUndoBtn.hidden = true;
+    scrambleNextBtn.hidden = false;
+  }
+
+  scrambleUndoBtn.addEventListener("click", function () {
+    if (scrambleAnswered || scrambleBuild.children.length === 0) return;
+    var last = scrambleBuild.lastElementChild;
+    scrambleBuild.removeChild(last);
+    scrambleBank.appendChild(last);
+  });
+  scrambleNextBtn.addEventListener("click", function () { scrambleIndex++; renderScrambleQuestion(); });
+  scrambleRestartBtn.addEventListener("click", function () { buildScrambleRound(); });
+
+  // ---------- practice: verb conjugation (present tense, high-frequency irregular verbs) ----------
+  var CONJ_VERBS = [
+    { inf: "être", en: "to be", zh: "是", pres: ["suis", "es", "est", "sommes", "êtes", "sont"] },
+    { inf: "avoir", en: "to have", zh: "有", pres: ["ai", "as", "a", "avons", "avez", "ont"] },
+    { inf: "aller", en: "to go", zh: "去", pres: ["vais", "vas", "va", "allons", "allez", "vont"] },
+    { inf: "faire", en: "to do / make", zh: "做", pres: ["fais", "fais", "fait", "faisons", "faites", "font"] },
+    { inf: "pouvoir", en: "to be able to", zh: "能够", pres: ["peux", "peux", "peut", "pouvons", "pouvez", "peuvent"] },
+    { inf: "vouloir", en: "to want", zh: "想要", pres: ["veux", "veux", "veut", "voulons", "voulez", "veulent"] },
+    { inf: "devoir", en: "to have to / must", zh: "应该", pres: ["dois", "dois", "doit", "devons", "devez", "doivent"] },
+    { inf: "savoir", en: "to know (a fact)", zh: "知道", pres: ["sais", "sais", "sait", "savons", "savez", "savent"] },
+    { inf: "venir", en: "to come", zh: "来", pres: ["viens", "viens", "vient", "venons", "venez", "viennent"] },
+    { inf: "prendre", en: "to take", zh: "拿，乘坐", pres: ["prends", "prends", "prend", "prenons", "prenez", "prennent"] },
+    { inf: "voir", en: "to see", zh: "看见", pres: ["vois", "vois", "voit", "voyons", "voyez", "voient"] },
+    { inf: "dire", en: "to say", zh: "说", pres: ["dis", "dis", "dit", "disons", "dites", "disent"] },
+    { inf: "mettre", en: "to put", zh: "放，穿上", pres: ["mets", "mets", "met", "mettons", "mettez", "mettent"] },
+    { inf: "croire", en: "to believe", zh: "相信", pres: ["crois", "crois", "croit", "croyons", "croyez", "croient"] },
+    { inf: "boire", en: "to drink", zh: "喝", pres: ["bois", "bois", "boit", "buvons", "buvez", "boivent"] },
+    { inf: "écrire", en: "to write", zh: "写", pres: ["écris", "écris", "écrit", "écrivons", "écrivez", "écrivent"] },
+    { inf: "lire", en: "to read", zh: "读", pres: ["lis", "lis", "lit", "lisons", "lisez", "lisent"] },
+    { inf: "connaître", en: "to know (person/place)", zh: "认识，了解", pres: ["connais", "connais", "connaît", "connaissons", "connaissez", "connaissent"] },
+    { inf: "vivre", en: "to live", zh: "生活", pres: ["vis", "vis", "vit", "vivons", "vivez", "vivent"] },
+    { inf: "tenir", en: "to hold", zh: "拿着，握着", pres: ["tiens", "tiens", "tient", "tenons", "tenez", "tiennent"] },
+    { inf: "sortir", en: "to go out", zh: "出去", pres: ["sors", "sors", "sort", "sortons", "sortez", "sortent"] },
+    { inf: "partir", en: "to leave", zh: "离开", pres: ["pars", "pars", "part", "partons", "partez", "partent"] },
+    { inf: "ouvrir", en: "to open", zh: "打开", pres: ["ouvre", "ouvres", "ouvre", "ouvrons", "ouvrez", "ouvrent"] },
+    { inf: "offrir", en: "to offer, give (a gift)", zh: "赠送", pres: ["offre", "offres", "offre", "offrons", "offrez", "offrent"] }
+  ];
+  var CONJ_PRONOUNS = ["je", "tu", "il / elle", "nous", "vous", "ils / elles"];
+
+  var conjQueue = [];
+  var conjIndex = 0;
+  var conjScore = { correct: 0, total: 0 };
+
+  function buildConjRound() {
+    conjScore = { correct: 0, total: 0 };
+    var items = [];
+    CONJ_VERBS.forEach(function (v) {
+      for (var p = 0; p < 6; p++) items.push({ verb: v, p: p });
+    });
+    shuffleArr(items);
+    conjQueue = items.slice(0, QUIZ_ROUND_SIZE);
+    conjIndex = 0;
+    renderConjQuestion();
+  }
+
+  function renderConjQuestion() {
+    conjScoreEl.textContent = "本轮：" + conjScore.correct + " / " + conjScore.total;
+    if (conjIndex >= conjQueue.length) {
+      conjQuestionEl.innerHTML =
+        '<span class="fr-word">本轮完成！</span>' +
+        '<span class="srs-info" style="display:block;margin-top:6px;">答对 ' + conjScore.correct + ' / ' + conjScore.total + ' 题</span>';
+      conjOptionsEl.innerHTML = "";
+      conjNextBtn.hidden = true;
+      return;
+    }
+    var item = conjQueue[conjIndex];
+    var v = item.verb, p = item.p;
+    var correct = v.pres[p];
+    conjQuestionEl.innerHTML =
+      '<span class="srs-info">' + v.en + ' · ' + v.zh + '</span>' +
+      '<span class="fr-word" style="display:block;margin-top:6px;">' + CONJ_PRONOUNS[p] + ' <em>' + v.inf + '</em></span>';
+
+    var others = CONJ_VERBS.filter(function (o) { return o.inf !== v.inf; });
+    shuffleArr(others);
+    var options = [correct];
+    for (var i = 0; i < others.length && options.length < 4; i++) {
+      var cand = others[i].pres[p];
+      if (options.indexOf(cand) === -1) options.push(cand);
+    }
+    shuffleArr(options);
+
+    conjNextBtn.hidden = true;
+    conjOptionsEl.innerHTML = "";
+    options.forEach(function (opt) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quiz-option";
+      btn.textContent = opt;
+      btn.addEventListener("click", function () { answerConj(correct, opt, btn); });
+      conjOptionsEl.appendChild(btn);
+    });
+  }
+
+  function answerConj(correct, chosen, chosenBtn) {
+    var buttons = conjOptionsEl.querySelectorAll(".quiz-option");
+    var isCorrect = chosen === correct;
+    conjScore.total++;
+    if (isCorrect) conjScore.correct++;
+    buttons.forEach(function (b) {
+      b.disabled = true;
+      if (b.textContent === correct) b.classList.add("correct");
+      else if (b === chosenBtn) b.classList.add("wrong");
+    });
+    conjScoreEl.textContent = "本轮：" + conjScore.correct + " / " + conjScore.total;
+    conjNextBtn.hidden = false;
+  }
+
+  function buildConjTable() {
+    conjTableBody.innerHTML = "";
+    CONJ_VERBS.forEach(function (v) {
+      var tr = document.createElement("tr");
+      var infTd = document.createElement("td");
+      infTd.className = "fr-cell";
+      infTd.innerHTML = v.inf + '<div class="pos-cell">' + v.en + " · " + v.zh + "</div>";
+      tr.appendChild(infTd);
+      v.pres.forEach(function (form) {
+        var td = document.createElement("td");
+        td.textContent = form;
+        tr.appendChild(td);
+      });
+      conjTableBody.appendChild(tr);
+    });
+  }
+
+  conjNextBtn.addEventListener("click", function () { conjIndex++; renderConjQuestion(); });
+  conjRestartBtn.addEventListener("click", function () { buildConjRound(); });
+
+  function setConjView(view) {
+    conjDrillBtn.setAttribute("aria-pressed", String(view === "drill"));
+    conjTableBtn.setAttribute("aria-pressed", String(view === "table"));
+    conjDrillWrap.hidden = view !== "drill";
+    conjTableWrap.hidden = view !== "table";
+    if (view === "drill" && conjQueue.length === 0) buildConjRound();
+  }
+  conjDrillBtn.addEventListener("click", function () { setConjView("drill"); });
+  conjTableBtn.addEventListener("click", function () { setConjView("table"); });
+
+  // ---------- practice mode switcher (选择题 / 听写 / 造句 / 变位) ----------
+  function setPracticeMode(mode) {
+    state.practiceMode = mode;
+    pmChoiceBtn.setAttribute("aria-pressed", String(mode === "choice"));
+    pmDictationBtn.setAttribute("aria-pressed", String(mode === "dictation"));
+    pmScrambleBtn.setAttribute("aria-pressed", String(mode === "scramble"));
+    pmConjBtn.setAttribute("aria-pressed", String(mode === "conj"));
+    modeChoice.hidden = mode !== "choice";
+    modeDictation.hidden = mode !== "dictation";
+    modeScramble.hidden = mode !== "scramble";
+    modeConj.hidden = mode !== "conj";
+    if (mode === "choice" && quizQueue.length === 0) buildQuizRound();
+    if (mode === "dictation" && dictQueue.length === 0) buildDictRound();
+    if (mode === "scramble" && scrambleQueue.length === 0) buildScrambleRound();
+    if (mode === "conj" && conjQueue.length === 0) buildConjRound();
+  }
+  pmChoiceBtn.addEventListener("click", function () { setPracticeMode("choice"); });
+  pmDictationBtn.addEventListener("click", function () { setPracticeMode("dictation"); });
+  pmScrambleBtn.addEventListener("click", function () { setPracticeMode("scramble"); });
+  pmConjBtn.addEventListener("click", function () { setPracticeMode("conj"); });
+
   // ---------- init ----------
   buildSchemeBar();
   buildLevelBar();
@@ -4640,6 +5140,7 @@
   rebuildDeck();
   renderList();
   buildQuizRound();
+  buildConjTable();
   setTab("study");
 })();
 </script>
