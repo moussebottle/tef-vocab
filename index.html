@@ -5394,6 +5394,15 @@
   buildConfusBrowse();
   setTab("study");
 })();
+
+// Offline support: cache this page so it still opens with no signal
+// (subway, plane mode). Registered outside the IIFE above since it's
+// independent of app state and shouldn't be able to affect it.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").catch(function () {});
+  });
+}
 </script>
 </body>
 </html>
