@@ -23,6 +23,7 @@
     --ink-muted: #8c7a74;
     --line: #efdfda;
     --shadow: 0 1px 2px rgba(90, 60, 50, 0.06), 0 8px 24px -12px rgba(90, 60, 50, 0.18);
+    --shadow-card: 0 2px 5px rgba(90, 60, 50, 0.08), 0 24px 44px -18px rgba(90, 60, 50, 0.32);
     --radius: 18px;
     --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", Georgia, serif;
     --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
@@ -35,6 +36,7 @@
       --accent: #e7935c; --accent-ink: #241a14;
       --ink: #f3e9e4; --ink-muted: #b6a29a; --line: #40312d;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+      --shadow-card: 0 2px 5px rgba(0,0,0,.4), 0 28px 52px -20px rgba(0,0,0,.7);
     }
   }
   :root[data-theme="dark"] {
@@ -44,6 +46,7 @@
     --accent: #e7935c; --accent-ink: #241a14;
     --ink: #f3e9e4; --ink-muted: #b6a29a; --line: #40312d;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.55);
+    --shadow-card: 0 2px 5px rgba(0,0,0,.4), 0 28px 52px -20px rgba(0,0,0,.7);
   }
   :root[data-theme="light"] {
     --bg: #fffcf9; --surface: #ffffff; --surface-2: #fff8f4;
@@ -52,6 +55,7 @@
     --accent: #dd8a4e; --accent-ink: #ffffff;
     --ink: #3b2f2c; --ink-muted: #8c7a74; --line: #efdfda;
     --shadow: 0 1px 2px rgba(90,60,50,.06), 0 8px 24px -12px rgba(90,60,50,.18);
+    --shadow-card: 0 2px 5px rgba(90,60,50,.08), 0 24px 44px -18px rgba(90,60,50,.32);
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -115,6 +119,16 @@
   .pillrow.scheme button[aria-pressed="true"] { border-style: solid; }
   .filter-label { font-size: .68rem; color: var(--ink-muted); letter-spacing: .04em; margin: 10px 0 6px; text-transform: uppercase; }
 
+  .filter-toggle {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 12px; padding: 10px 14px; font-size: .84rem; font-weight: 600;
+    cursor: pointer; margin-bottom: 10px;
+  }
+  .filter-toggle .chev { color: var(--ink-muted); font-size: .72rem; transition: transform .2s; }
+  .filter-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  #filterSection { margin-bottom: 6px; }
+
   .opts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 12px 0 4px; }
   label.check { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--ink-muted); cursor: pointer; }
   label.check input { accent-color: var(--accent); width: 15px; height: 15px; }
@@ -135,9 +149,12 @@
   .empty { text-align: center; color: var(--ink-muted); padding: 48px 16px; font-size: .92rem; line-height: 1.7; }
 
   /* ---------- Study deck (flashcard) ---------- */
-  .deck { margin-top: 18px; }
-  .deck-count { text-align: center; font-size: .78rem; color: var(--ink-muted); margin-bottom: 10px; font-variant-numeric: tabular-nums; }
-  .study-card { perspective: 1400px; max-width: 380px; margin: 0 auto; height: 280px; touch-action: pan-y; }
+  .deck { margin-top: 14px; }
+  .deck-count { text-align: center; font-size: .78rem; color: var(--ink-muted); margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+  .study-card {
+    perspective: 1800px; max-width: min(94vw, 460px); margin: 0 auto;
+    height: min(60vh, 440px); min-height: 340px; touch-action: pan-y;
+  }
   .study-card-inner {
     position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
     transition: transform .45s cubic-bezier(.4,.2,.2,1); cursor: pointer;
@@ -145,63 +162,64 @@
   .study-card.flipped .study-card-inner { transform: rotateY(180deg); }
   .sface {
     position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden;
-    border-radius: 22px; padding: 26px 24px; display: flex; flex-direction: column;
-    border: 1px solid var(--line); box-shadow: var(--shadow);
+    border-radius: 28px; padding: 34px 28px; display: flex; flex-direction: column;
+    border: 1px solid var(--line); border-top-width: 5px; box-shadow: var(--shadow-card);
   }
-  .sface.front { background: var(--surface); justify-content: space-between; align-items: center; text-align: center; }
-  .sface.back { transform: rotateY(180deg); justify-content: center; align-items: center; text-align: center; gap: 10px; overflow-y: auto; }
-  .sface.back.tint-pink { background: var(--pink); }
-  .sface.back.tint-orange { background: var(--orange); }
-  .sface.back.multi { justify-content: flex-start; padding-top: 20px; }
+  .sface.front { background: var(--surface); justify-content: space-between; align-items: center; text-align: center; border-top-color: var(--pink-strong); }
+  .sface.front.tint-orange { border-top-color: var(--orange-strong); }
+  .sface.back { transform: rotateY(180deg); justify-content: center; align-items: center; text-align: center; gap: 12px; overflow-y: auto; }
+  .sface.back.tint-pink { background: var(--pink); border-top-color: var(--pink-strong); }
+  .sface.back.tint-orange { background: var(--orange); border-top-color: var(--orange-strong); }
+  .sface.back.multi { justify-content: flex-start; padding-top: 26px; }
 
-  .lvl-tag { font-size: .66rem; padding: 3px 10px; border-radius: 99px; letter-spacing: .02em; }
+  .lvl-tag { font-size: .68rem; padding: 3px 11px; border-radius: 99px; letter-spacing: .02em; }
   .lvl-tag.pink { background: var(--pink); color: var(--pink-ink); }
   .lvl-tag.orange { background: var(--orange); color: var(--orange-ink); }
   .sface .cat-line { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: center; }
   .fr-line { display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
   .sface .fr-line { margin: auto 0; }
   .speak-btn {
-    border: none; background: none; cursor: pointer; font-size: 1rem; line-height: 1; padding: 4px;
+    border: none; background: none; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 4px;
     border-radius: 50%; flex-shrink: 0; -webkit-tap-highlight-color: transparent;
   }
   .speak-btn:hover, .speak-btn:focus-visible { background: rgba(0,0,0,.08); }
   .speak-btn.mini-speak { font-size: .82rem; padding: 2px; vertical-align: -1px; }
-  .sface .fr-word { font-family: var(--font-display); font-size: 2rem; line-height: 1.2; text-wrap: balance; }
-  .sface .ipa-line { font-family: "Doulos SIL", "Charis SIL", Gentium, "Segoe UI", var(--font-body); font-size: .92rem; color: var(--accent); letter-spacing: .01em; }
-  .sface .pos-line { font-size: .78rem; color: var(--ink-muted); font-style: italic; }
-  .sface .taphint { font-size: .68rem; color: var(--ink-muted); }
-  .sface .sense { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; width: 100%; }
-  .sface.back.multi .sense { padding: 8px 0; border-top: 1px dashed var(--line); }
+  .sface .fr-word { font-family: var(--font-display); font-size: clamp(2.1rem, 1.5rem + 4vw, 2.75rem); line-height: 1.15; text-wrap: balance; }
+  .sface .ipa-line { font-family: "Doulos SIL", "Charis SIL", Gentium, "Segoe UI", var(--font-body); font-size: 1.05rem; color: var(--accent); letter-spacing: .01em; }
+  .sface .pos-line { font-size: .82rem; color: var(--ink-muted); font-style: italic; }
+  .sface .taphint { font-size: .72rem; color: var(--ink-muted); }
+  .sface .sense { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; width: 100%; }
+  .sface.back.multi .sense { padding: 10px 0; border-top: 1px dashed var(--line); }
   .sface.back.multi .sense:first-child { border-top: none; padding-top: 0; }
   .sense-num {
-    display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px;
-    border-radius: 50%; background: rgba(0,0,0,.09); font-size: .64rem; font-weight: 700; color: var(--ink-muted);
+    display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;
+    border-radius: 50%; background: rgba(0,0,0,.09); font-size: .66rem; font-weight: 700; color: var(--ink-muted);
   }
-  .sface .en-word { font-size: 1.25rem; font-weight: 700; }
-  .sface .zh-word { font-size: 1.2rem; }
-  .sface .zh-word::before { content: "中 "; font-size: .64rem; color: var(--ink-muted); }
-  .sface .en-word::before { content: "EN "; font-size: .58rem; color: var(--ink-muted); vertical-align: 2px; }
+  .sface .en-word { font-size: 1.42rem; font-weight: 700; }
+  .sface .zh-word { font-size: 1.38rem; }
+  .sface .zh-word::before { content: "中 "; font-size: .66rem; color: var(--ink-muted); }
+  .sface .en-word::before { content: "EN "; font-size: .6rem; color: var(--ink-muted); vertical-align: 2px; }
   .example {
-    width: 100%; margin-top: 8px; padding-top: 10px; border-top: 1px dashed var(--line);
-    display: flex; flex-direction: column; gap: 3px; text-align: center; flex-shrink: 0;
+    width: 100%; margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--line);
+    display: flex; flex-direction: column; gap: 4px; text-align: center; flex-shrink: 0;
   }
-  .example .ex-fr { font-size: .82rem; font-style: italic; color: var(--ink); }
-  .example .ex-zh { font-size: .78rem; color: var(--ink-muted); }
+  .example .ex-fr { font-size: .9rem; font-style: italic; color: var(--ink); }
+  .example .ex-zh { font-size: .84rem; color: var(--ink-muted); }
 
-  .deck-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; }
+  .deck-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 22px; }
   .deck-nav button {
     border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-    border-radius: 14px; padding: 13px 18px; font-size: .95rem; cursor: pointer; font-weight: 600;
-    min-width: 44px; flex-shrink: 0;
+    border-radius: 16px; padding: 16px 22px; font-size: 1.05rem; cursor: pointer; font-weight: 600;
+    min-width: 48px; flex-shrink: 0;
   }
-  .deck-hint { flex: 1; text-align: center; font-size: .8rem; color: var(--ink-muted); }
+  .deck-hint { flex: 1; text-align: center; font-size: .82rem; color: var(--ink-muted); }
   .swipe-hint { text-align: center; color: var(--ink-muted); font-size: .74rem; margin-top: 12px; }
 
-  .grade-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+  .grade-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
   .grade-row button.grade {
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    border: 1px solid var(--line); background: var(--surface); border-radius: 14px;
-    padding: 10px 4px; font-size: 1.3rem; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    border: 1px solid var(--line); background: var(--surface); border-radius: 16px;
+    padding: 13px 4px; font-size: 1.55rem; cursor: pointer;
   }
   .grade-row button.grade span { font-size: .72rem; font-weight: 600; color: var(--ink-muted); }
   .grade-row button.again:hover, .grade-row button.again:focus-visible { border-color: #d97a6b; background: color-mix(in srgb, #d97a6b 12%, var(--surface)); }
@@ -328,12 +346,18 @@
     <button id="tabListBtn" role="tab" aria-selected="false" type="button">☰ 浏览列表</button>
   </div>
 
-  <div class="pillrow level" id="levelBar"></div>
-  <div class="pillrow scheme" id="schemeBar"></div>
-  <div class="filter-label" id="majorLabel">主题大类</div>
-  <div class="pillrow" id="majorBar"></div>
-  <div class="filter-label" id="subCatLabel" hidden>子分类</div>
-  <div class="pillrow" id="catBar" hidden></div>
+  <button type="button" class="filter-toggle" id="filterToggleBtn" aria-expanded="false">
+    <span id="filterSummary">🔍 全部难度 · 全部主题</span>
+    <span class="chev" aria-hidden="true">▾</span>
+  </button>
+  <div id="filterSection" hidden>
+    <div class="pillrow level" id="levelBar"></div>
+    <div class="pillrow scheme" id="schemeBar"></div>
+    <div class="filter-label" id="majorLabel">主题大类</div>
+    <div class="pillrow" id="majorBar"></div>
+    <div class="filter-label" id="subCatLabel" hidden>子分类</div>
+    <div class="pillrow" id="catBar" hidden></div>
+  </div>
 
   <!-- Study (flashcard) panel -->
   <section id="studyPanel">
@@ -4145,6 +4169,9 @@
   var deckIndex = 0;
 
   // ---------- element refs ----------
+  var filterToggleBtn = document.getElementById("filterToggleBtn");
+  var filterSection = document.getElementById("filterSection");
+  var filterSummary = document.getElementById("filterSummary");
   var levelBar = document.getElementById("levelBar");
   var schemeBar = document.getElementById("schemeBar");
   var majorLabel = document.getElementById("majorLabel");
@@ -4473,6 +4500,7 @@
     var tn = tint(w);
     deckCount.textContent = "第 " + (deckIndex + 1) + " / " + deck.length + " 个";
 
+    studyFront.className = "sface front tint-" + tn;
     var speakBtn = TTS_OK ? '<button type="button" class="speak-btn" data-fr="' + w.fr + '" aria-label="朗读">🔊</button>' : "";
     studyFront.innerHTML =
       '<span class="cat-line"><span class="lvl-tag ' + tn + '">' + w.level + " · " + w.cat + '</span></span>' +
@@ -4692,11 +4720,36 @@
   tabQuizBtn.addEventListener("click", function () { setTab("quiz"); });
   tabListBtn.addEventListener("click", function () { setTab("list"); });
 
+  // Collapsed by default -- the level/topic/pos filter bars are useful but
+  // bulky, and most sessions just want "study everything" or one of the
+  // due/daily/weak toggles. The summary line keeps the current filter
+  // visible at a glance without needing it expanded.
+  function setFilterSectionOpen(open) {
+    filterSection.hidden = !open;
+    filterToggleBtn.setAttribute("aria-expanded", String(open));
+  }
+  filterToggleBtn.addEventListener("click", function () {
+    setFilterSectionOpen(filterSection.hidden);
+  });
+
+  function updateFilterSummary() {
+    var scheme = currentScheme();
+    var parts = [state.level === "全部" ? "全部难度" : state.level];
+    if (state.major === "全部") {
+      parts.push("全部" + scheme.majorLabel.replace(/大类$/, ""));
+    } else {
+      parts.push(state.major);
+      if (state.cat !== "全部") parts.push(scheme.subLabel(state.cat));
+    }
+    filterSummary.textContent = "🔍 " + parts.join(" · ");
+  }
+
   function onFiltersChanged() {
     buildSchemeBar();
     buildLevelBar();
     buildMajorBar();
     buildCatBar();
+    updateFilterSummary();
     rebuildDeck();
     renderList();
     buildQuizRound();
@@ -5427,6 +5480,7 @@
   buildLevelBar();
   buildMajorBar();
   buildCatBar();
+  updateFilterSummary();
   updateStats();
   rebuildDeck();
   renderList();
