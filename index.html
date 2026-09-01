@@ -317,7 +317,7 @@
       <p>基础 + 进阶词汇 · 英中双语 · 参照牛津法英词典</p>
     </div>
     <div class="stats">
-      <div class="figure">已掌握 <b id="masteredCount">0</b> / <span id="totalCount">0</span> · 待复习 <b id="dueCount">0</b></div>
+      <div class="figure">已掌握 <b id="masteredCount">0</b> / <span id="totalCount">0</span> · 待复习 <b id="dueCount">0</b> · 薄弱 <b id="weakCount">0</b></div>
       <div class="bar"><span id="progressBar" style="width:0%"></span></div>
     </div>
   </header>
@@ -341,9 +341,11 @@
       <label class="check"><input type="checkbox" id="shuffleCb" /> 乱序播放</label>
       <label class="check"><input type="checkbox" id="onlyDueStudy" /> 只看待复习</label>
       <label class="check"><input type="checkbox" id="dailyModeCb" /> 🎯 今日学习包</label>
+      <label class="check"><input type="checkbox" id="weakModeCb" /> 📉 只看薄弱词</label>
       <button class="reshuffle" id="reshuffleBtn" type="button" hidden>🔀 换个顺序</button>
     </div>
     <p class="daily-hint" id="dailyHint" hidden>自动组合「到期复习词」+「最多 10 个新词」，不用手动筛选，学完当天该学的就够了。</p>
+    <p class="daily-hint" id="weakHint" hidden>反复被评为"没记住"（至少2次）、目前还没掌握的词——直接从已有的复习记录里筛出来，不用手动标记。</p>
 
     <div id="studyEmpty" class="empty" hidden>这组条件下没有单词，换个分类或取消筛选试试。</div>
 
@@ -475,6 +477,9 @@
     </div>
     <label class="check" style="margin: 8px 0 0;">
       <input type="checkbox" id="onlyUnmasteredList" /> 只看未掌握
+    </label>
+    <label class="check" style="margin: 8px 0 0 14px;">
+      <input type="checkbox" id="onlyWeakList" /> 📉 只看薄弱词
     </label>
     <div id="listEmpty" class="empty" hidden>没有找到匹配的单词，换个关键词试试。</div>
     <div class="list-wrap" id="listWrap">
@@ -4019,12 +4024,20 @@
     var rec = srs[fr];
     return !!rec && rec.box >= MASTERED_BOX;
   }
+  // A word you've seen before, keep failing (graded "again" 2+ times), and
+  // haven't mastered yet -- the SRS box already carries this signal, this
+  // just surfaces it instead of leaving it buried in the data.
+  function isWeak(fr) {
+    var rec = srs[fr];
+    return !!rec && (rec.lapses || 0) >= 2 && rec.box < MASTERED_BOX;
+  }
   // grade: "again" (forgot it) | "hard" (shaky) | "good" (knew it)
   function gradeWord(fr, grade) {
     var rec = srs[fr] || { box: 0, due: todayStr() };
     if (grade === "again") {
       rec.box = 0;
       rec.due = todayStr();
+      rec.lapses = (rec.lapses || 0) + 1;
     } else if (grade === "hard") {
       var half = Math.max(1, Math.floor(BOX_INTERVALS[rec.box] / 2));
       rec.due = addDaysStr(todayStr(), half);
@@ -4149,7 +4162,10 @@
   var onlyDueStudy = document.getElementById("onlyDueStudy");
   var dailyModeCb = document.getElementById("dailyModeCb");
   var dailyHint = document.getElementById("dailyHint");
+  var weakModeCb = document.getElementById("weakModeCb");
+  var weakHint = document.getElementById("weakHint");
   var onlyUnmasteredList = document.getElementById("onlyUnmasteredList");
+  var onlyWeakList = document.getElementById("onlyWeakList");
   var reshuffleBtn = document.getElementById("reshuffleBtn");
   var studyEmpty = document.getElementById("studyEmpty");
   var deckArea = document.getElementById("deckArea");
@@ -4234,6 +4250,7 @@
   var masteredCountEl = document.getElementById("masteredCount");
   var totalCountEl = document.getElementById("totalCount");
   var dueCountEl = document.getElementById("dueCount");
+  var weakCountEl = document.getElementById("weakCount");
   var progressBar = document.getElementById("progressBar");
   var resetBtn = document.getElementById("resetBtn");
 
@@ -4374,6 +4391,7 @@
       if (state.major !== "全部" && wordMajor(w) !== state.major) return false;
       if (state.cat !== "全部" && wordSub(w) !== state.cat) return false;
       if (!forStudy && onlyUnmasteredList.checked && isMastered(w.fr)) return false;
+      if (!forStudy && onlyWeakList.checked && !isWeak(w.fr)) return false;
       if (!forStudy && q) {
         if (w.fr.toLowerCase().indexOf(q) !== -1) return true;
         if (w.ipa && w.ipa.indexOf(q) !== -1) return true;
@@ -4400,18 +4418,23 @@
     if (forStudy && onlyDueStudy.checked) {
       return base.filter(function (w) { return isDue(w.fr); });
     }
+    if (forStudy && weakModeCb.checked) {
+      return base.filter(function (w) { return isWeak(w.fr); });
+    }
     return base;
   }
 
   function updateStats() {
-    var total = 0, due = 0;
+    var total = 0, due = 0, weak = 0;
     VOCAB.forEach(function (w) {
       if (isMastered(w.fr)) total++;
       if (isDue(w.fr)) due++;
+      if (isWeak(w.fr)) weak++;
     });
     masteredCountEl.textContent = total;
     totalCountEl.textContent = VOCAB.length;
     dueCountEl.textContent = due;
+    weakCountEl.textContent = weak;
     progressBar.style.width = (VOCAB.length ? (total / VOCAB.length * 100) : 0) + "%";
   }
 
@@ -4497,7 +4520,10 @@
       renderStudyCard();
       return;
     }
-    if ((onlyDueStudy.checked || dailyModeCb.checked) && !isDue(w.fr)) {
+    var dropFromDeck =
+      ((onlyDueStudy.checked || dailyModeCb.checked) && !isDue(w.fr)) ||
+      (weakModeCb.checked && !isWeak(w.fr));
+    if (dropFromDeck) {
       deck.splice(deckIndex, 1);
       if (deckIndex >= deck.length) deckIndex = 0;
       renderStudyCard();
@@ -4551,12 +4577,26 @@
 
   shuffleCb.addEventListener("change", function () { state.shuffle = shuffleCb.checked; rebuildDeck(); });
   onlyDueStudy.addEventListener("change", function () {
-    if (onlyDueStudy.checked) { dailyModeCb.checked = false; dailyHint.hidden = true; }
+    if (onlyDueStudy.checked) {
+      dailyModeCb.checked = false; dailyHint.hidden = true;
+      weakModeCb.checked = false; weakHint.hidden = true;
+    }
     rebuildDeck();
   });
   dailyModeCb.addEventListener("change", function () {
-    if (dailyModeCb.checked) { onlyDueStudy.checked = false; }
+    if (dailyModeCb.checked) {
+      onlyDueStudy.checked = false;
+      weakModeCb.checked = false; weakHint.hidden = true;
+    }
     dailyHint.hidden = !dailyModeCb.checked;
+    rebuildDeck();
+  });
+  weakModeCb.addEventListener("change", function () {
+    if (weakModeCb.checked) {
+      onlyDueStudy.checked = false;
+      dailyModeCb.checked = false; dailyHint.hidden = true;
+    }
+    weakHint.hidden = !weakModeCb.checked;
     rebuildDeck();
   });
 
@@ -4583,7 +4623,7 @@
         var on = isMastered(w.fr);
         star.setAttribute("aria-pressed", String(on));
         star.textContent = on ? "★" : "☆";
-        if (onlyUnmasteredList.checked) renderList();
+        if (onlyUnmasteredList.checked || onlyWeakList.checked) renderList();
       });
       starTd.appendChild(star);
 
@@ -4629,6 +4669,7 @@
 
   searchInput.addEventListener("input", function (e) { state.query = e.target.value; renderList(); });
   onlyUnmasteredList.addEventListener("change", renderList);
+  onlyWeakList.addEventListener("change", renderList);
 
   // ---------- tabs ----------
   function setTab(tab) {
