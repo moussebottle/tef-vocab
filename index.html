@@ -4423,12 +4423,25 @@
   }
 
   var TTS_OK = (typeof window.speechSynthesis !== "undefined");
+  // Setting utterance.lang alone doesn't reliably make every browser pick a
+  // matching voice -- on Windows especially, Chrome/Edge often just use
+  // whatever the OS's default voice is (usually English) unless a voice is
+  // assigned explicitly, so French text ends up read with an English accent.
+  // Pick a French voice ourselves instead of relying on lang-based fallback.
+  function pickFrenchVoice() {
+    var voices = (window.speechSynthesis.getVoices && window.speechSynthesis.getVoices()) || [];
+    return voices.find(function (v) { return /^fr-fr$/i.test(v.lang); })
+      || voices.find(function (v) { return /^fr/i.test(v.lang); })
+      || null;
+  }
   function speak(text) {
     if (!TTS_OK || !text) return;
     try {
       window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text.replace(/[()]/g, ""));
       u.lang = "fr-FR";
+      var v = pickFrenchVoice();
+      if (v) u.voice = v;
       u.rate = 0.92;
       window.speechSynthesis.speak(u);
     } catch (e) {}
