@@ -12,7 +12,10 @@
 //
 // Bump CACHE_NAME if this file's *logic* changes, so old caches get swept.
 var CACHE_NAME = "tef-vocab-v1";
-var PRECACHE_URLS = ["./", "./index.html"];
+var PRECACHE_URLS = [
+  "./", "./index.html", "./manifest.json",
+  "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon.png"
+];
 
 self.addEventListener("install", function (event) {
   self.skipWaiting();
