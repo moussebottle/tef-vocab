@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="2900+ 个 TEF/TCF 法语词汇闪卡，含音标、语音朗读和多义词释义，浅粉浅橘极简配色，适合手机背单词。">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%87%AB%F0%9F%87%B7%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./favicon.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="theme-color" content="#dd8a4e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="法语背单词">
 <title>法语背单词 · TEF/TCF 词汇</title>
 <style>
   :root {
@@ -91,6 +97,11 @@
   .stats .figure b { color: var(--ink); font-weight: 700; }
   .bar { width: 108px; height: 7px; border-radius: 99px; background: var(--line); overflow: hidden; }
   .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--pink-strong), var(--accent)); border-radius: 99px; transition: width .4s ease; }
+
+  .storage-warn {
+    background: var(--orange); border: 1px solid var(--orange-strong); color: var(--orange-ink);
+    border-radius: var(--radius); padding: 12px 16px; font-size: .82rem; line-height: 1.6; margin-bottom: 14px;
+  }
 
   /* ---------- Tabs ---------- */
   .tabbar { display: flex; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; margin-bottom: 14px; }
@@ -211,14 +222,7 @@
   .example .ex-fr { font-size: .9rem; font-style: italic; color: var(--ink); }
   .example .ex-zh { font-size: .84rem; color: var(--ink-muted); }
 
-  .deck-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 22px; }
-  .deck-nav button {
-    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-    border-radius: 16px; padding: 16px 26px; font-size: 1.05rem; cursor: pointer; font-weight: 600;
-    min-width: 48px; flex-shrink: 0;
-  }
-
-  .grade-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+  .grade-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 26px; }
   .grade-row button.grade {
     display: flex; align-items: center; justify-content: center;
     border: 1px solid var(--line); background: var(--surface); border-radius: 18px;
@@ -343,6 +347,10 @@
     </div>
   </header>
 
+  <div id="storageWarning" class="storage-warn" hidden>
+    这台设备/浏览器现在没法保存学习记录（常见于隐私模式或存储空间受限），练习进度不会保留。建议退出隐私模式后重新打开，或练习后用页面底部的"导出进度"手动备份一份。
+  </div>
+
   <div class="tabbar" role="tablist">
     <button id="tabStudyBtn" role="tab" aria-selected="true" type="button">闪卡背词</button>
     <button id="tabQuizBtn" role="tab" aria-selected="false" type="button">练习</button>
@@ -389,10 +397,6 @@
           <div class="sface front" id="studyFront"></div>
           <div class="sface back" id="studyBack"></div>
         </div>
-      </div>
-      <div class="deck-nav">
-        <button class="side" id="prevBtn" type="button" aria-label="上一个">‹</button>
-        <button class="side" id="nextBtn" type="button" aria-label="下一个">›</button>
       </div>
       <div class="grade-row" id="gradeRow" hidden>
         <button class="grade again" id="gradeAgainBtn" type="button"><span>没记住</span></button>
@@ -4002,6 +4006,20 @@
   var MASTERED_BOX = 4;                              // box at/above this counts as "mastered"
   var srs = {}; // { [fr]: { box: 0-5, due: "YYYY-MM-DD" } }
 
+  // Saving used to fail silently (private/incognito mode, or storage disabled)
+  // -- grading a card looked like it worked, but nothing was actually written,
+  // so progress vanished the next time the page loaded. Surface that instead.
+  var STORAGE_OK = true;
+  (function checkStorageWritable() {
+    try {
+      var t = "__tef_storage_test__";
+      window.localStorage.setItem(t, "1");
+      window.localStorage.removeItem(t);
+    } catch (e) {
+      STORAGE_OK = false;
+    }
+  })();
+
   function pad2(n) { return (n < 10 ? "0" : "") + n; }
   function todayStr() {
     var d = new Date();
@@ -4045,7 +4063,16 @@
   })();
 
   function saveSrs() {
-    try { window.localStorage.setItem(SRS_KEY, JSON.stringify(srs)); } catch (e) {}
+    try {
+      window.localStorage.setItem(SRS_KEY, JSON.stringify(srs));
+      STORAGE_OK = true;
+    } catch (e) {
+      STORAGE_OK = false;
+    }
+    updateStorageWarning();
+  }
+  function updateStorageWarning() {
+    if (storageWarning) storageWarning.hidden = STORAGE_OK;
   }
   function isDue(fr) {
     var rec = srs[fr];
@@ -4176,6 +4203,8 @@
   var deckIndex = 0;
 
   // ---------- element refs ----------
+  var storageWarning = document.getElementById("storageWarning");
+  updateStorageWarning();
   var filterToggleBtn = document.getElementById("filterToggleBtn");
   var filterSection = document.getElementById("filterSection");
   var filterSummary = document.getElementById("filterSummary");
@@ -4210,8 +4239,6 @@
   var studyCardInner = document.getElementById("studyCardInner");
   var studyFront = document.getElementById("studyFront");
   var studyBack = document.getElementById("studyBack");
-  var prevBtn = document.getElementById("prevBtn");
-  var nextBtn = document.getElementById("nextBtn");
   var gradeRow = document.getElementById("gradeRow");
   var gradeAgainBtn = document.getElementById("gradeAgainBtn");
   var gradeHardBtn = document.getElementById("gradeHardBtn");
@@ -4566,7 +4593,8 @@
     }
   }
 
-  // pointer-based tap/swipe on study card
+  // pointer-based tap-to-flip on study card -- no swipe-to-skip, grading is
+  // the only way to move through the deck (see gradeCurrent).
   (function attachPointer() {
     var startX = 0, startY = 0, moved = false, active = false;
     studyCardInner.addEventListener("pointerdown", function (e) {
@@ -4580,17 +4608,10 @@
     studyCardInner.addEventListener("pointerup", function (e) {
       if (!active) return;
       active = false;
-      var dx = e.clientX - startX, dy = e.clientY - startY;
-      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) goTo(1); else goTo(-1);
-      } else if (!moved) {
-        flipStudy();
-      }
+      if (!moved) flipStudy();
     });
   })();
 
-  prevBtn.addEventListener("click", function () { goTo(-1); });
-  nextBtn.addEventListener("click", function () { goTo(1); });
   gradeAgainBtn.addEventListener("click", function () { gradeCurrent("again"); });
   gradeHardBtn.addEventListener("click", function () { gradeCurrent("hard"); });
   gradeGoodBtn.addEventListener("click", function () { gradeCurrent("good"); });
@@ -4599,9 +4620,7 @@
   document.addEventListener("keydown", function (e) {
     if (state.tab !== "study") return;
     if (e.target && (e.target.tagName === "INPUT")) return;
-    if (e.key === "ArrowLeft") goTo(-1);
-    else if (e.key === "ArrowRight") goTo(1);
-    else if (e.key === " " || e.key === "Enter") { e.preventDefault(); flipStudy(); }
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); flipStudy(); }
     else if (studyCard.classList.contains("flipped")) {
       if (e.key === "1") gradeCurrent("again");
       else if (e.key === "2") gradeCurrent("hard");
