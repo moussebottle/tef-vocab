@@ -1,0 +1,17 @@
+{
+  "name": "法语背单词 · TEF/TCF 词汇",
+  "short_name": "法语背单词",
+  "description": "2900+ 个 TEF/TCF 法语词汇闪卡，含音标、语音朗读和多义词释义。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fffcf9",
+  "theme_color": "#dd8a4e",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
