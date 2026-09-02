@@ -150,10 +150,14 @@
 
   /* ---------- Study deck (flashcard) ---------- */
   .deck { margin-top: 14px; }
-  .deck-count { text-align: center; font-size: .78rem; color: var(--ink-muted); margin-bottom: 12px; font-variant-numeric: tabular-nums; }
   .study-card {
-    perspective: 1800px; max-width: min(94vw, 460px); margin: 0 auto;
-    height: min(60vh, 440px); min-height: 340px; touch-action: pan-y;
+    position: relative; perspective: 1800px; max-width: min(97vw, 540px); margin: 0 auto;
+    height: min(72vh, 600px); min-height: 400px; touch-action: pan-y;
+  }
+  .deck-count {
+    position: absolute; top: 14px; right: 18px; z-index: 2; pointer-events: none;
+    font-size: .7rem; color: var(--ink-muted); font-variant-numeric: tabular-nums;
+    background: var(--surface-2); padding: 3px 11px; border-radius: 99px; opacity: .85;
   }
   .study-card-inner {
     position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
@@ -162,7 +166,7 @@
   .study-card.flipped .study-card-inner { transform: rotateY(180deg); }
   .sface {
     position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden;
-    border-radius: 28px; padding: 34px 28px; display: flex; flex-direction: column;
+    border-radius: 30px; padding: 40px 32px; display: flex; flex-direction: column;
     border: 1px solid var(--line); border-top-width: 5px; box-shadow: var(--shadow-card);
   }
   .sface.front { background: var(--surface); justify-content: space-between; align-items: center; text-align: center; border-top-color: var(--pink-strong); }
@@ -179,15 +183,16 @@
   .fr-line { display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
   .sface .fr-line { margin: auto 0; }
   .speak-btn {
-    border: none; background: none; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 4px;
-    border-radius: 50%; flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--accent);
+    cursor: pointer; font-size: .78rem; font-weight: 700; line-height: 1; padding: 6px 12px;
+    border-radius: 99px; flex-shrink: 0; -webkit-tap-highlight-color: transparent;
   }
-  .speak-btn:hover, .speak-btn:focus-visible { background: rgba(0,0,0,.08); }
-  .speak-btn.mini-speak { font-size: .82rem; padding: 2px; vertical-align: -1px; }
-  .sface .fr-word { font-family: var(--font-display); font-size: clamp(2.1rem, 1.5rem + 4vw, 2.75rem); line-height: 1.15; text-wrap: balance; }
-  .sface .ipa-line { font-family: "Doulos SIL", "Charis SIL", Gentium, "Segoe UI", var(--font-body); font-size: 1.05rem; color: var(--accent); letter-spacing: .01em; }
-  .sface .pos-line { font-size: .82rem; color: var(--ink-muted); font-style: italic; }
-  .sface .taphint { font-size: .72rem; color: var(--ink-muted); }
+  .speak-btn:hover, .speak-btn:focus-visible { background: var(--orange); border-color: var(--orange-strong); }
+  .speak-btn.mini-speak { font-size: .66rem; padding: 3px 9px; vertical-align: 1px; }
+  .sface .fr-word { font-family: var(--font-display); font-size: clamp(2.4rem, 1.5rem + 5.5vw, 3.3rem); line-height: 1.15; text-wrap: balance; }
+  .sface .ipa-line { font-family: "Doulos SIL", "Charis SIL", Gentium, "Segoe UI", var(--font-body); font-size: 1.2rem; color: var(--accent); letter-spacing: .01em; }
+  .sface .pos-line { font-size: .9rem; color: var(--ink-muted); font-style: italic; }
+  .sface .taphint { font-size: .76rem; color: var(--ink-muted); }
   .sface .sense { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; width: 100%; }
   .sface.back.multi .sense { padding: 10px 0; border-top: 1px dashed var(--line); }
   .sface.back.multi .sense:first-child { border-top: none; padding-top: 0; }
@@ -195,8 +200,8 @@
     display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;
     border-radius: 50%; background: rgba(0,0,0,.09); font-size: .66rem; font-weight: 700; color: var(--ink-muted);
   }
-  .sface .en-word { font-size: 1.42rem; font-weight: 700; }
-  .sface .zh-word { font-size: 1.38rem; }
+  .sface .en-word { font-size: 1.55rem; font-weight: 700; }
+  .sface .zh-word { font-size: 1.5rem; }
   .sface .zh-word::before { content: "中 "; font-size: .66rem; color: var(--ink-muted); }
   .sface .en-word::before { content: "EN "; font-size: .6rem; color: var(--ink-muted); vertical-align: 2px; }
   .example {
@@ -206,22 +211,20 @@
   .example .ex-fr { font-size: .9rem; font-style: italic; color: var(--ink); }
   .example .ex-zh { font-size: .84rem; color: var(--ink-muted); }
 
-  .deck-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 22px; }
+  .deck-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 22px; }
   .deck-nav button {
     border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-    border-radius: 16px; padding: 16px 22px; font-size: 1.05rem; cursor: pointer; font-weight: 600;
+    border-radius: 16px; padding: 16px 26px; font-size: 1.05rem; cursor: pointer; font-weight: 600;
     min-width: 48px; flex-shrink: 0;
   }
-  .deck-hint { flex: 1; text-align: center; font-size: .82rem; color: var(--ink-muted); }
-  .swipe-hint { text-align: center; color: var(--ink-muted); font-size: .74rem; margin-top: 12px; }
 
-  .grade-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
+  .grade-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
   .grade-row button.grade {
-    display: flex; flex-direction: column; align-items: center; gap: 5px;
-    border: 1px solid var(--line); background: var(--surface); border-radius: 16px;
-    padding: 13px 4px; font-size: 1.55rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); background: var(--surface); border-radius: 18px;
+    padding: 22px 6px; cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
-  .grade-row button.grade span { font-size: .72rem; font-weight: 600; color: var(--ink-muted); }
+  .grade-row button.grade span { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
   .grade-row button.again:hover, .grade-row button.again:focus-visible { border-color: #d97a6b; background: color-mix(in srgb, #d97a6b 12%, var(--surface)); }
   .grade-row button.hard:hover, .grade-row button.hard:focus-visible { border-color: var(--orange-strong); background: var(--orange); }
   .grade-row button.good:hover, .grade-row button.good:focus-visible { border-color: #6fae7c; background: color-mix(in srgb, #6fae7c 14%, var(--surface)); }
@@ -341,13 +344,13 @@
   </header>
 
   <div class="tabbar" role="tablist">
-    <button id="tabStudyBtn" role="tab" aria-selected="true" type="button">📇 闪卡背词</button>
-    <button id="tabQuizBtn" role="tab" aria-selected="false" type="button">🎯 练习</button>
-    <button id="tabListBtn" role="tab" aria-selected="false" type="button">☰ 浏览列表</button>
+    <button id="tabStudyBtn" role="tab" aria-selected="true" type="button">闪卡背词</button>
+    <button id="tabQuizBtn" role="tab" aria-selected="false" type="button">练习</button>
+    <button id="tabListBtn" role="tab" aria-selected="false" type="button">浏览列表</button>
   </div>
 
   <button type="button" class="filter-toggle" id="filterToggleBtn" aria-expanded="false">
-    <span id="filterSummary">🔍 全部难度 · 全部主题</span>
+    <span id="filterSummary">全部难度 · 全部主题</span>
     <span class="chev" aria-hidden="true">▾</span>
   </button>
   <div id="filterSection" hidden>
@@ -361,21 +364,27 @@
 
   <!-- Study (flashcard) panel -->
   <section id="studyPanel">
-    <div class="opts">
-      <label class="check"><input type="checkbox" id="shuffleCb" /> 乱序播放</label>
-      <label class="check"><input type="checkbox" id="onlyDueStudy" /> 只看待复习</label>
-      <label class="check"><input type="checkbox" id="dailyModeCb" /> 🎯 今日学习包</label>
-      <label class="check"><input type="checkbox" id="weakModeCb" /> 📉 只看薄弱词</label>
-      <button class="reshuffle" id="reshuffleBtn" type="button" hidden>🔀 换个顺序</button>
+    <button type="button" class="filter-toggle" id="studySettingsToggle" aria-expanded="false">
+      <span>学习设置</span>
+      <span class="chev" aria-hidden="true">▾</span>
+    </button>
+    <div id="studySettings" hidden>
+      <div class="opts">
+        <label class="check"><input type="checkbox" id="shuffleCb" /> 乱序播放</label>
+        <label class="check"><input type="checkbox" id="onlyDueStudy" /> 只看待复习</label>
+        <label class="check"><input type="checkbox" id="dailyModeCb" /> 今日学习包</label>
+        <label class="check"><input type="checkbox" id="weakModeCb" /> 只看薄弱词</label>
+        <button class="reshuffle" id="reshuffleBtn" type="button" hidden>换个顺序</button>
+      </div>
+      <p class="daily-hint" id="dailyHint" hidden>自动组合「到期复习词」+「最多 10 个新词」，不用手动筛选，学完当天该学的就够了。</p>
+      <p class="daily-hint" id="weakHint" hidden>反复被评为"没记住"（至少2次）、目前还没掌握的词——直接从已有的复习记录里筛出来，不用手动标记。</p>
     </div>
-    <p class="daily-hint" id="dailyHint" hidden>自动组合「到期复习词」+「最多 10 个新词」，不用手动筛选，学完当天该学的就够了。</p>
-    <p class="daily-hint" id="weakHint" hidden>反复被评为"没记住"（至少2次）、目前还没掌握的词——直接从已有的复习记录里筛出来，不用手动标记。</p>
 
     <div id="studyEmpty" class="empty" hidden>这组条件下没有单词，换个分类或取消筛选试试。</div>
 
     <div class="deck" id="deckArea">
-      <div class="deck-count" id="deckCount"></div>
       <div class="study-card" id="studyCard">
+        <span class="deck-count" id="deckCount"></span>
         <div class="study-card-inner" id="studyCardInner">
           <div class="sface front" id="studyFront"></div>
           <div class="sface back" id="studyBack"></div>
@@ -383,32 +392,30 @@
       </div>
       <div class="deck-nav">
         <button class="side" id="prevBtn" type="button" aria-label="上一个">‹</button>
-        <span class="deck-hint" id="deckHint">点击卡片翻面查看释义</span>
         <button class="side" id="nextBtn" type="button" aria-label="下一个">›</button>
       </div>
       <div class="grade-row" id="gradeRow" hidden>
-        <button class="grade again" id="gradeAgainBtn" type="button">😵<span>没记住</span></button>
-        <button class="grade hard" id="gradeHardBtn" type="button">🤔<span>有点印象</span></button>
-        <button class="grade good" id="gradeGoodBtn" type="button">😀<span>记住了</span></button>
+        <button class="grade again" id="gradeAgainBtn" type="button"><span>没记住</span></button>
+        <button class="grade hard" id="gradeHardBtn" type="button"><span>有点印象</span></button>
+        <button class="grade good" id="gradeGoodBtn" type="button"><span>记住了</span></button>
       </div>
-      <p class="swipe-hint">左右滑动可跳过 · 翻面后请选一个掌握程度</p>
     </div>
   </section>
 
   <!-- Practice panel (multiple-choice quiz / dictation / sentence scramble / conjugation) -->
   <section id="quizPanel" hidden>
     <div class="pillrow" id="practiceModeBar">
-      <button type="button" id="pmChoiceBtn" aria-pressed="true">🎯 选择题</button>
-      <button type="button" id="pmDictationBtn" aria-pressed="false">🔊 听写</button>
-      <button type="button" id="pmScrambleBtn" aria-pressed="false">🔀 造句</button>
-      <button type="button" id="pmConjBtn" aria-pressed="false">📐 变位</button>
-      <button type="button" id="pmConfusBtn" aria-pressed="false">⚡ 易混词</button>
+      <button type="button" id="pmChoiceBtn" aria-pressed="true">选择题</button>
+      <button type="button" id="pmDictationBtn" aria-pressed="false">听写</button>
+      <button type="button" id="pmScrambleBtn" aria-pressed="false">造句</button>
+      <button type="button" id="pmConjBtn" aria-pressed="false">变位</button>
+      <button type="button" id="pmConfusBtn" aria-pressed="false">易混词</button>
     </div>
 
     <div id="modeChoice">
       <div class="opts">
         <span class="quiz-score" id="quizScore">本轮：0 / 0</span>
-        <button class="reshuffle" id="quizRestartBtn" type="button">🔄 换一批</button>
+        <button class="reshuffle" id="quizRestartBtn" type="button">换一批</button>
       </div>
       <div id="quizEmpty" class="empty" hidden>这组筛选条件下词太少（至少需要 4 个），换个大类或取消筛选试试。</div>
       <div class="quiz-card" id="quizArea">
@@ -421,7 +428,7 @@
     <div id="modeDictation" hidden>
       <div class="opts">
         <span class="quiz-score" id="dictScore">本轮：0 / 0</span>
-        <button class="reshuffle" id="dictRestartBtn" type="button">🔄 换一批</button>
+        <button class="reshuffle" id="dictRestartBtn" type="button">换一批</button>
       </div>
       <div id="dictEmpty" class="empty" hidden>这组筛选条件下词太少（至少需要 4 个），换个大类或取消筛选试试。</div>
       <div class="quiz-card" id="dictArea">
@@ -434,14 +441,14 @@
     <div id="modeScramble" hidden>
       <div class="opts">
         <span class="quiz-score" id="scrambleScore">本轮：0 / 0</span>
-        <button class="reshuffle" id="scrambleRestartBtn" type="button">🔄 换一批</button>
+        <button class="reshuffle" id="scrambleRestartBtn" type="button">换一批</button>
       </div>
       <div id="scrambleEmpty" class="empty" hidden>带例句的词还不够（句子至少要 3 个词），换个分类试试。</div>
       <div class="quiz-card" id="scrambleArea">
         <div class="quiz-question" id="scrambleHint"></div>
         <div class="scramble-build" id="scrambleBuild"></div>
         <div class="scramble-bank" id="scrambleBank"></div>
-        <button type="button" class="reshuffle" id="scrambleUndoBtn">↩ 撤销一个</button>
+        <button type="button" class="reshuffle" id="scrambleUndoBtn">撤销一个</button>
         <button class="quiz-next-btn" id="scrambleNextBtn" type="button" hidden>下一题 →</button>
       </div>
     </div>
@@ -454,7 +461,7 @@
       <div id="conjDrillWrap">
         <div class="opts">
           <span class="quiz-score" id="conjScore">本轮：0 / 0</span>
-          <button class="reshuffle" id="conjRestartBtn" type="button">🔄 换一批</button>
+          <button class="reshuffle" id="conjRestartBtn" type="button">换一批</button>
         </div>
         <div class="quiz-card" id="conjArea">
           <div class="quiz-question" id="conjQuestion"></div>
@@ -480,7 +487,7 @@
       <div id="confusDrillWrap">
         <div class="opts">
           <span class="quiz-score" id="confusScore">本轮：0 / 0</span>
-          <button class="reshuffle" id="confusRestartBtn" type="button">🔄 换一批</button>
+          <button class="reshuffle" id="confusRestartBtn" type="button">换一批</button>
         </div>
         <div class="quiz-card" id="confusArea">
           <div class="quiz-question" id="confusQuestion"></div>
@@ -503,7 +510,7 @@
       <input type="checkbox" id="onlyUnmasteredList" /> 只看未掌握
     </label>
     <label class="check" style="margin: 8px 0 0 14px;">
-      <input type="checkbox" id="onlyWeakList" /> 📉 只看薄弱词
+      <input type="checkbox" id="onlyWeakList" /> 只看薄弱词
     </label>
     <div id="listEmpty" class="empty" hidden>没有找到匹配的单词，换个关键词试试。</div>
     <div class="list-wrap" id="listWrap">
@@ -517,10 +524,10 @@
   </section>
 
   <footer>
-    <span>词义主要依据《牛津法英词典》（Oxford French Dictionary）常见义项整理，覆盖 TEF/TCF 基础到进阶（约 A2–C1）高频主题——两个考试考的是同一套 CEFR 通用法语能力，词汇上没有本质区别；名词保留冠词以辅助记忆阴阳性。粉色标签＝基础词汇，橙色标签＝进阶词汇。每个词都标注了国际音标（IPA），支持浏览器的设备可点 🔊 听真人合成发音（音标与发音由本工具整理生成，备考时建议再对照权威音频核实）。闪卡背诵用的是间隔复习：翻面后选"没记住 / 有点印象 / 记住了"，系统会据此安排这个词下次出现的时间，越容易忘的词会越快再考你。学习记录保存在本设备浏览器里，按法语单词本身记录，更新词库不会打乱它；但浏览器存储偶尔仍可能被清空，建议不定期用下面的"导出进度"存一份，需要时用"导入进度"恢复。</span>
+    <span>词义主要依据《牛津法英词典》（Oxford French Dictionary）常见义项整理，覆盖 TEF/TCF 基础到进阶（约 A2–C1）高频主题——两个考试考的是同一套 CEFR 通用法语能力，词汇上没有本质区别；名词保留冠词以辅助记忆阴阳性。粉色标签＝基础词汇，橙色标签＝进阶词汇。每个词都标注了国际音标（IPA），支持浏览器的设备可点"听"按钮听真人合成发音（音标与发音由本工具整理生成，备考时建议再对照权威音频核实）。闪卡背诵用的是间隔复习：翻面后选"没记住 / 有点印象 / 记住了"，系统会据此安排这个词下次出现的时间，越容易忘的词会越快再考你。学习记录保存在本设备浏览器里，按法语单词本身记录，更新词库不会打乱它；但浏览器存储偶尔仍可能被清空，建议不定期用下面的"导出进度"存一份，需要时用"导入进度"恢复。</span>
     <div class="footer-actions">
-      <button class="reset-btn" id="exportBtn" type="button">⬇ 导出进度</button>
-      <label class="reset-btn file-label" for="importFile">⬆ 导入进度</label>
+      <button class="reset-btn" id="exportBtn" type="button">导出进度</button>
+      <label class="reset-btn file-label" for="importFile">导入进度</label>
       <input type="file" id="importFile" accept="application/json,.json" hidden />
       <button class="reset-btn" id="resetBtn" type="button">重置学习进度</button>
     </div>
@@ -4117,7 +4124,7 @@
   // major/cat filter slots and the same pill-row UI area.
   var SCHEMES = {
     topic: {
-      switchLabel: "🗂 主题分类",
+      switchLabel: "主题分类",
       majorLabel: "主题大类",
       subCatLabel: "子分类",
       majorOrder: MAJOR_ORDER,
@@ -4127,7 +4134,7 @@
       subLabel: function (s) { return s; }
     },
     pos: {
-      switchLabel: "🔤 词性分类",
+      switchLabel: "词性分类",
       majorLabel: "词性大类",
       subCatLabel: "词性子类",
       majorOrder: POS_MAJOR_ORDER,
@@ -4182,6 +4189,8 @@
   var tabQuizBtn = document.getElementById("tabQuizBtn");
   var tabListBtn = document.getElementById("tabListBtn");
   var studyPanel = document.getElementById("studyPanel");
+  var studySettingsToggle = document.getElementById("studySettingsToggle");
+  var studySettings = document.getElementById("studySettings");
   var quizPanel = document.getElementById("quizPanel");
   var listPanel = document.getElementById("listPanel");
 
@@ -4201,7 +4210,6 @@
   var studyCardInner = document.getElementById("studyCardInner");
   var studyFront = document.getElementById("studyFront");
   var studyBack = document.getElementById("studyBack");
-  var deckHint = document.getElementById("deckHint");
   var prevBtn = document.getElementById("prevBtn");
   var nextBtn = document.getElementById("nextBtn");
   var gradeRow = document.getElementById("gradeRow");
@@ -4481,7 +4489,7 @@
   function srsCaption(fr) {
     var rec = srs[fr];
     if (!rec) return "尚未学习";
-    if (rec.due <= todayStr()) return "🔁 该复习了";
+    if (rec.due <= todayStr()) return "该复习了";
     var days = Math.max(1, Math.round((new Date(rec.due + "T00:00:00") - new Date(todayStr() + "T00:00:00")) / 86400000));
     return "第 " + rec.box + " 关 · " + days + " 天后复习";
   }
@@ -4495,20 +4503,19 @@
 
     studyCard.classList.remove("flipped");
     gradeRow.hidden = true;
-    deckHint.hidden = false;
     var w = deck[deckIndex];
     var tn = tint(w);
     deckCount.textContent = "第 " + (deckIndex + 1) + " / " + deck.length + " 个";
 
     studyFront.className = "sface front tint-" + tn;
-    var speakBtn = TTS_OK ? '<button type="button" class="speak-btn" data-fr="' + w.fr + '" aria-label="朗读">🔊</button>' : "";
+    var speakBtn = TTS_OK ? '<button type="button" class="speak-btn" data-fr="' + w.fr + '" aria-label="朗读">听</button>' : "";
     studyFront.innerHTML =
       '<span class="cat-line"><span class="lvl-tag ' + tn + '">' + w.level + " · " + w.cat + '</span></span>' +
       '<span class="fr-line"><span class="fr-word">' + w.fr + '</span>' + speakBtn + '</span>' +
       '<span class="ipa-line">[' + w.ipa + ']</span>' +
       '<span class="pos-line">' + w.pos + '</span>' +
       '<span class="srs-info">' + srsCaption(w.fr) + '</span>' +
-      '<span class="taphint">点击卡片查看释义' + (TTS_OK ? " · 点 🔊 听发音" : "") + '</span>';
+      '<span class="taphint">点击卡片查看释义' + (TTS_OK ? " · 点“听”按钮听发音" : "") + '</span>';
 
     var senses = sensesOf(w);
     studyBack.className = "sface back tint-" + tn + (senses.length > 1 || w.ex ? " multi" : "");
@@ -4531,7 +4538,6 @@
   function flipStudy() {
     var flipped = studyCard.classList.toggle("flipped");
     gradeRow.hidden = !flipped;
-    deckHint.hidden = flipped;
   }
 
   function gradeCurrent(grade) {
@@ -4657,7 +4663,7 @@
 
       var frTd = document.createElement("td");
       frTd.className = "fr-cell";
-      var listSpeakBtn = TTS_OK ? '<button type="button" class="speak-btn mini-speak" data-fr="' + w.fr + '" aria-label="朗读">🔊</button>' : "";
+      var listSpeakBtn = TTS_OK ? '<button type="button" class="speak-btn mini-speak" data-fr="' + w.fr + '" aria-label="朗读">听</button>' : "";
       frTd.innerHTML = '<span class="fr-line">' + w.fr + listSpeakBtn + '</span><div class="ipa-cell">[' + w.ipa + ']</div><div class="pos-cell">' + w.pos + "</div>";
 
       var senses = sensesOf(w);
@@ -4732,6 +4738,17 @@
     setFilterSectionOpen(filterSection.hidden);
   });
 
+  // Same idea for the study-settings drawer (shuffle/due/daily/weak toggles) --
+  // collapsed by default so the study screen is just the card and the grade
+  // buttons; expand only when someone actually wants to change a setting.
+  function setStudySettingsOpen(open) {
+    studySettings.hidden = !open;
+    studySettingsToggle.setAttribute("aria-expanded", String(open));
+  }
+  studySettingsToggle.addEventListener("click", function () {
+    setStudySettingsOpen(studySettings.hidden);
+  });
+
   function updateFilterSummary() {
     var scheme = currentScheme();
     var parts = [state.level === "全部" ? "全部难度" : state.level];
@@ -4741,7 +4758,7 @@
       parts.push(state.major);
       if (state.cat !== "全部") parts.push(scheme.subLabel(state.cat));
     }
-    filterSummary.textContent = "🔍 " + parts.join(" · ");
+    filterSummary.textContent = parts.join(" · ");
   }
 
   function onFiltersChanged() {
@@ -4884,7 +4901,7 @@
 
     var w = quizQueue[quizIndex];
     var tn = tint(w);
-    var speakBtn = TTS_OK ? '<button type="button" class="speak-btn" data-fr="' + w.fr + '" aria-label="朗读">🔊</button>' : "";
+    var speakBtn = TTS_OK ? '<button type="button" class="speak-btn" data-fr="' + w.fr + '" aria-label="朗读">听</button>' : "";
     quizQuestionEl.innerHTML =
       '<span class="cat-line"><span class="lvl-tag ' + tn + '">' + w.level + " · " + w.cat + '</span></span>' +
       '<span class="fr-line"><span class="fr-word">' + w.fr + '</span>' + speakBtn + '</span>' +
@@ -4974,7 +4991,7 @@
 
     var w = dictQueue[dictIndex];
     dictQuestionEl.innerHTML = TTS_OK
-      ? '<button type="button" class="speak-btn dict-speak" data-fr="' + w.fr + '">🔊 点击听发音</button>' +
+      ? '<button type="button" class="speak-btn dict-speak" data-fr="' + w.fr + '">点击听发音</button>' +
         '<span class="srs-info" style="display:block;margin-top:10px;">' + sensesOf(w)[0].zh + '</span>'
       : '<span class="srs-info">此设备不支持语音朗读，听写模式无法使用</span>';
     if (TTS_OK) speak(w.fr);
